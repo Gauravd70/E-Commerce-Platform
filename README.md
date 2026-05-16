@@ -7,11 +7,10 @@
     - [Functional Requirements](#functional-requirements)
     - [Non-Functional Requirements](#non-functional-requirements)
     - [Services](#services)
-- [Low Level Design (LLD)](#low-level-design-hld)
-- [Interaction Diagram](#interaction-diagram)
+- [Deployment](#deployment)
 
 # Tech stack
-- Java 18
+- Java 21
 - SpringBoot 4.0.6
 - MySQL 9.7.0
 - MongoDB 8.3.2
@@ -61,7 +60,7 @@
 6. Scalable
 
 ## Services
-- [Auth Service](#auth-service)
+- [Auth Service](auth-service/README.md)
 - [Product Service](#product-service)
 - [Search Service](#search-service)
 - [Recommendation Service](#recommendation-service)
@@ -70,50 +69,6 @@
 - [Payment Gateway](#payment-gateway)
 - [Cart Service](#cart-service)
 - [Analytics Service](#analytics-service)
-
-## Auth Service
-This service is responsible for authenticating and authorizing the users. 
-
-### API Specs
-- POST /v1/login 
-```
-Request Body: 
-{
-    "username": "asda@gmail.com",
-    "password": "sadasd"
-}
-
-Response Body:
-
-200 OK + session cookie 
-
-401 Unauthorized
-```
-- POST /v1/logout
-```
-200 OK
-```
-- POST /v1/signup
-```
-Request Body: 
-{
-    "firstName": "asdsad",
-    "lastName": "asdasd",
-    "username": "asda@gmail.com",
-    "password": "sadasda",
-    "confirmPassword": "asdasda"
-}
-
-Response Body:
-
-200 OK {
-    "message": "User created successfully"
-}
-
-400 Bad Request {
-    "message": "User already exists"
-}
-```
 
 ## Product Service
 This service is responsible for showing the products catalogue and viewing the product details.
@@ -445,15 +400,6 @@ This service manages all the reviews for the products.
 ```
 ```
 
-# Low Level Design (LLD)
-
-## Session Cookie model
-```
-{
-    "userId": "abcd123"
-}
-```
-
 ## Checkout Cookie Model
 ```
 {
@@ -463,9 +409,7 @@ This service manages all the reviews for the products.
     "expiresAt": "timestamp"
 }
 ```
-
-# Interaction Diagram
-
+  
 # Deployment
 - Services are built using their respective Dockerfile
 - Services are deployed on Kubernetes
