@@ -1,2 +1,471 @@
 # E-Commerce-Platform
 [System Design] E-Commerce Platform such as Amazon, Flipkart, Myntra, etc.
+
+# Contents
+- [Tech Stack](#tech-stack)
+- [High Level Design (HLD)](#high-level-design-hld)
+    - [Functional Requirements](#functional-requirements)
+    - [Non-Functional Requirements](#non-functional-requirements)
+    - [Services](#services)
+- [Low Level Design (LLD)](#low-level-design-hld)
+- [Interaction Diagram](#interaction-diagram)
+
+# Tech stack
+- Java 18
+- SpringBoot 4.0.6
+- MySQL 9.7.0
+- MongoDB 8.3.2
+- Grafana
+- Prometheus
+- Docker
+- Kubernetes
+
+# High Level Design (HLD)
+## Functional Requirements
+### Login/Signup
+1. User should be able to login to the platform
+2. User should be able to logout to the platform
+3. User should be able to register to the platform
+
+### Products/Cart
+1. User should be able to view the products catalogue
+2. User should be able search a product
+3. User should be able to view the product details
+4. User should be able to add the product to the cart
+5. User should be able to remove a product from the cart
+6. User should be able to checkout the card
+7. User should be able to make the payment and confirm the order.
+8. Users should get product recommendations based on their activity
+
+### Listing
+1. User should be able to list a new product
+2. User should be able to see all their listings
+3. User should be able to remove a listing
+4. Only logged in users should be able to list
+5. User should be able to view product analytics
+
+### Observability
+1. Platform admin should be able to see the system performance metrics
+2. Platform admin should be able to see the system health
+3. Each service should generate relevant logs for debugging
+4. Each service should generate events for analytics
+
+### Monitoring
+1. Alerts should be raised based on relevant triggers
+
+## Non-Functional Requirements
+1. Low latency
+2. Highly Available
+3. Fault Tolerant
+4. High consistency
+6. Scalable
+
+## Services
+- [Auth Service](#auth-service)
+- [Product Service](#product-service)
+- [Search Service](#search-service)
+- [Recommendation Service](#recommendation-service)
+- [Listing Service](#listing-service)
+- [Checkout Service](#checkout-service)
+- [Payment Gateway](#payment-gateway)
+- [Cart Service](#cart-service)
+- [Analytics Service](#analytics-service)
+
+## Auth Service
+This service is responsible for authenticating and authorizing the users. 
+
+### API Specs
+- POST /v1/login 
+```
+Request Body: 
+{
+    "username": "asda@gmail.com",
+    "password": "sadasd"
+}
+
+Response Body:
+
+200 OK + session cookie 
+
+401 Unauthorized
+```
+- POST /v1/logout
+```
+200 OK
+```
+- POST /v1/signup
+```
+Request Body: 
+{
+    "firstName": "asdsad",
+    "lastName": "asdasd",
+    "username": "asda@gmail.com",
+    "password": "sadasda",
+    "confirmPassword": "asdasda"
+}
+
+Response Body:
+
+200 OK {
+    "message": "User created successfully"
+}
+
+400 Bad Request {
+    "message": "User already exists"
+}
+```
+
+## Product Service
+This service is responsible for showing the products catalogue and viewing the product details.
+
+### API Specs
+
+- GET /v1/products
+```
+Query params:
+sortBy = (price|rating)
+sortOrder = (asc|desc)
+
+Response Body: 
+{
+    products: [
+        {
+            "id": "abcd123",
+            "thumbnail": "image URL",
+            "name": "asdasd",
+            "price": 20.0
+        },
+        .
+        .
+        .,
+        {
+            "id": "abcd123",
+            "thumbnail": "image URL",
+            "name": "asdasd",
+            "price": 20.0
+        }
+    ],
+    "count": 20,
+    "totalCount": 100,
+    "firstOffset": "abcd123",
+    "lastOffset": "abcd123"
+}
+```
+- GET /v1/products/{productId}
+```
+{
+    "id": "abcd123",
+    "thumbnail": "image URL",
+    "name": "asdasd",
+    "images": [url1,....url2],
+    "price": 20.0,
+    "quantity": 5,
+    "category": "asbcd",
+    "seller": "asdabd",
+    "description": "adsanda"
+}
+```
+
+## Search Service
+This service is responsible for searching product based on the provided input. This service uses fuzzy search to get the most probable word for the provided input and return the search result for it. It also makes use of elastic search to search for text based product search. 
+
+### Fuzzy Search
+Fuzzy search is an alogrithm where we find the [Levenshtein distance](https://medium.com/@ethannam/understanding-the-levenshtein-distance-equation-for-beginners-c4285a5604f0) between the input and a probable world. The word with the least distance is considered as the input user wanted to enter and results are returned based on the same.
+
+### API Specs
+
+- POST /v1/products/search
+```
+Query params:
+searchText = url encoded string
+sortBy = (price|rating)
+sortOrder = (asc|desc)
+
+Response Body: 
+{
+    products: [
+        {
+            "id": "abcd123",
+            "thumbnail": "image URL",
+            "name": "asdasd",
+            "price": 20.0
+        },
+        .
+        .
+        .,
+        {
+            "id": "abcd123",
+            "thumbnail": "image URL",
+            "name": "asdasd",
+            "price": 20.0
+        }
+    ],
+    "count": 20,
+    "totalCount": 100,
+    "firstOffset": "abcd123",
+    "lastOffset": "abcd123"
+}
+```
+
+## Recommendation Service
+This service is responsible for providing product suggestions based on the users past activities.
+
+## Listing Service
+This service is responsible for providing APIs to manage product listings.
+
+### API Specs
+
+- POST /v1/listings
+```
+Request Body: 
+{
+    "thumbnail": "image URL",
+    "name": "asdasd",
+    "images": [url1,....url2],
+    "price": 20.0,
+    "quantity": 5,
+    "category": "asbcd",
+    "seller": "asdava",
+    "sellerId": "abcd123",
+    "description": "adsanda"
+}
+
+Response Body:
+200 OK {
+    "message":"Listing created successfully"
+}
+```
+- POST /v1/listings/{sellerId}
+```
+Response Body:
+{
+    products: [
+        {
+            "thumbnail": "image URL",
+            "name": "asdasd"
+        }
+        .
+        .
+        .,
+        {
+            "thumbnail": "image URL",
+            "name": "asdasd"
+        }
+    ]
+}
+```
+- GET /v1/listings/{sellerId}/{productId}
+```
+Response Body: 
+200 OK {
+    "thumbnail": "image URL",
+    "name": "asdasd",
+    "images": [url1,....url2],
+    "price": 20.0,
+    "quantity": 5,
+    "category": "asbcd",
+    "description": "adsanda"
+}
+
+400 BAD REQUEST {
+    "message": "No product found"
+}
+```
+- PUT /v1/listings/{sellerId}/{productId} (partial updates)
+```
+Request Body:
+{
+    "thumbnail": "image URL",
+    "name": "asdasd",
+    "images": [url1,....url2],
+    "price": 20.0,
+    "quantity": 5,
+    "category": "asbcd",
+    "description": "adsanda"
+}
+
+Response Body:
+200 OK {
+    "message": "Listing updated successfully"
+}
+
+400 BAD REQUEST {
+    "message": "No product found"
+}
+```
+
+- DELETE /v1/listings/{sellerId}/{productId}
+```
+Response Body:
+200 OK {
+    "message": "Listing deleted successfully"
+}
+
+400 BAD REQUEST {
+    "message": "No product found"
+}
+```
+
+## Checkout Service
+This service is responsible for managing the checkout session. Starts a checkout session which keeps tracks of the various steps completed in the checkout session. The steps involved in a checkout are as belows:
+1. Check the item availablity
+2. Enter Delivery details like name, address, number, email.
+3. Show final bill
+4. Select payment method
+5. Final check for item availability 
+5. Redirect to payment gateway
+6. Wait for payment confirmation
+7. Show order details like order Id, expected delivery date, delivery address, payment details, etc.
+
+### API Specs
+
+- POST /v1/checkout/{cartId}
+```
+200 OK + checkout session cookie
+```
+
+## Payment Gateway
+This service is responsible for handling payments using the third party payment providers.
+
+## Cart Service
+This service is responsible for keeping track of the products in a cart for logged in users.
+
+### API Specs
+
+- POST /v1/carts
+```
+Request Body:
+{
+    "cartName": "casdas"
+}
+```
+- PUT /v1/carts/{cartId} (partial updates)
+```
+Request Body:
+{
+    "cartName": "casdas"
+}
+```
+- GET /v1/carts/{cartId}
+```
+Request Body:
+{
+    "products": [
+        {
+            "id": "abcd123",
+            "quantity": 2
+        }
+        .
+        .
+        .,
+        {
+            "id": "abcd123",
+            "quantity": 1
+        }
+    ]
+}
+```
+- DELETE /v1/carts/{cartId} 
+```
+
+```
+- POST /v1/carts/{cartId}/{productId}
+```
+Request Body:
+{
+    "quantity": 2
+}
+```
+
+- DELETE /v1/carts/{cartId}/{productId}
+```
+```
+
+- PATCH /v1/cart/{cartId}/{productId}
+```
+{
+    "quantity": 1
+}
+```
+
+## Analytics Service
+This service keeps tracks of analytics.
+
+### API Specs
+
+## Review Service
+This service manages all the reviews for the products.
+
+### API Specs
+- POST /v1/reviews/{productId}
+```
+{
+    "rating": 4,
+    "comment": "",
+    images: [url1,....url2]
+}
+```
+- GET /v1/reviews/{productId}
+```
+{
+    reviews: [
+        {
+            "rating": 4,
+            "title": "",
+            "comment": "",
+            "images": [url1,...url2] 
+        }
+        .
+        .
+        .
+        {
+            "rating": 4,
+            "title": "",
+            "comment": "",
+            "images": [url1,...url2] 
+        }
+    ]
+    "count": 10,
+    "totalReviews": 1000,
+    "overallRating": 4.5,
+    "firstOffset": "reviewId",
+    "lastOffset": "reviewId"
+}
+```
+- PUT /v1/reviews/{productId}/{reviewId} (replace)
+```
+{
+    "rating": 4,
+    "title": "",
+    "comment": "",
+    "images": [url1,...url2] 
+}
+```
+- DELETE /v1/reviews/{productId}/{reviewId}
+```
+```
+
+# Low Level Design (LLD)
+
+## Session Cookie model
+```
+{
+    "userId": "abcd123"
+}
+```
+
+## Checkout Cookie Model
+```
+{
+    "userId": "abcd123",
+    "cartId": "asdasd1123",
+    "startedAt": "timestamp",
+    "expiresAt": "timestamp"
+}
+```
+
+# Interaction Diagram
+
+# Deployment
+- Services are built using their respective Dockerfile
+- Services are deployed on Kubernetes
