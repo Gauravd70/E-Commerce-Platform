@@ -12,8 +12,9 @@
 # Tech stack
 - Java 21
 - SpringBoot 4.0.6
-- MySQL 9.7.0
+- MySQL 8.0.36
 - MongoDB 8.3.2
+- Test Containers
 - Grafana
 - Prometheus
 - Docker

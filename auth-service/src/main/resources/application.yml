@@ -1,2 +1,23 @@
 server:
   port: 8081
+spring:
+  datasource:
+    # url: jdbc:mysql://localhost:3306/your_database_name?useSSL=false&serverTimezone=UTC
+    username: root
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+jwt:
+  secret: 7Hk29PzXm4Vb1Nq5Wj8Lr6Tc3Dy9Gf0S
+  expiry:
+    access: 360000
+    refresh: 60480000

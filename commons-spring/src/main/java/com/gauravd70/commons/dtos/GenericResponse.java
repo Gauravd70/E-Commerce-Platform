@@ -1,4 +1,4 @@
-package com.gauravd70.commons;
+package com.gauravd70.commons.dtos;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
