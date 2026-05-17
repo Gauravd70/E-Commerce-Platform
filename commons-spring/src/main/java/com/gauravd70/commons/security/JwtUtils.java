@@ -1,6 +1,7 @@
 package com.gauravd70.commons.security;
 
 import java.security.Key;
+import java.security.SignatureException;
 import java.util.Date;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -92,8 +94,11 @@ public class JwtUtils {
      * @param jwt {@link String}
      * @return {@link Claims}
      * @throws JwtException
+     * @throws SignatureException
+     * @throws ExpiredJwtException
+     * @throws IllegalArgumentException
      */
-    public Claims getClaims(String jwt) throws JwtException {
+    public Claims getClaims(String jwt) throws JwtException, SignatureException, ExpiredJwtException, IllegalArgumentException {
         return Jwts
             .parserBuilder()
             .setSigningKey(getSigningKey())
