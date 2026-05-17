@@ -2,11 +2,13 @@ package com.gauravd70.commons.security;
 
 import java.security.Key;
 import java.security.SignatureException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -14,7 +16,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Component
@@ -22,14 +23,14 @@ public class JwtUtils {
     @Value("${jwt.secret:DEFAULT_KEY}")
     private String jwtSecret;
 
-    @Value("${jwt.expiry.access:360000}")
+    @Value("${jwt.expiry.access:3600000}")
     private long accessTokenExpiryInMs;
 
-    @Value("${jwt.expiry.refresh:60480000}")
+    @Value("${jwt.expiry.refresh:604800000}")
     private long refreshTokenExpiryInMs;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
     }
     
     private String create(String userId, Map<String, Object> claims, long expiryInMs) {
@@ -69,11 +70,15 @@ public class JwtUtils {
     public ResponseCookie createCookie(JwtType type, String userId, Map<String, Object> claims) {
         String jwt = create(type, userId, claims);
 
+        ResponseCookieBuilder responseCookieBuilder;
+
         if(JwtType.REFRESH_TOKEN.equals(type)) {
-            return ResponseCookie.from(JwtType.REFRESH_TOKEN.name(), jwt).httpOnly(true).path("/").maxAge(refreshTokenExpiryInMs).build();
+            responseCookieBuilder = ResponseCookie.from(JwtType.REFRESH_TOKEN.name(), jwt).maxAge(refreshTokenExpiryInMs);
+        } else {
+            responseCookieBuilder = ResponseCookie.from(JwtType.ACCESS_TOKEN.name(), jwt).maxAge(accessTokenExpiryInMs);
         }
 
-        return ResponseCookie.from(JwtType.ACCESS_TOKEN.name(), jwt).httpOnly(true).path("/").maxAge(accessTokenExpiryInMs).build();
+        return responseCookieBuilder.httpOnly(true).path("/").sameSite("Strict").build();
     }
 
     /**

@@ -17,13 +17,17 @@ Request Body:
 
 Response Body:
 
-200 OK + session cookie 
+200 OK + ACCESS_TOKEN (cookie) 
 
-401 Unauthorized
+401 UNAUTHORIZED {
+    "message": "Incorrect username or passoword."
+}
 ```
 - POST /v1/logout
 ```
 200 OK
+
+401 UNAUTHORIZED
 ```
 - POST /v1/signup
 ```
@@ -42,8 +46,12 @@ Response Body:
     "message": "User created successfully"
 }
 
-400 Bad Request {
+400 BAD REQUEST {
     "message": "User already exists"
+}
+
+400 BAD REQUEST {
+    "message": "Passwords do not match"
 }
 ```
 

@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @RestControllerAdvice
 public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {InternalServerException.class, Exception.class})
-    public Mono<ResponseEntity<GenericResponse>> handleInternalServerException(InternalServerException e) {
+    public Mono<ResponseEntity<GenericResponse>> handleInternalServerException(Exception e) {
         return Mono.just(ResponseEntity.internalServerError().body(GenericResponse.builder().message(e.getMessage()).build()));
     }
 

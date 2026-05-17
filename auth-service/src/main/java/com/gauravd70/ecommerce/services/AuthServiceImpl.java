@@ -52,8 +52,8 @@ public class AuthServiceImpl implements AuthService {
 
                 HttpHeaders httpHeaders = new HttpHeaders();
 
-                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.create(JwtType.ACCESS_TOKEN, userId, claims).toString());
-                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.create(JwtType.REFRESH_TOKEN, userId, claims).toString());
+                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.createCookie(JwtType.ACCESS_TOKEN, userId, claims).toString());
+                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.createCookie(JwtType.REFRESH_TOKEN, userId, claims).toString());
 
                 return httpHeaders;
             })
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
     public Mono<GenericResponse> onSignUp(SignUpRequest request) {
         return Mono.just(request)
             .filter(req -> req.getPassword().equals(req.getConfirmPassword()))
-            .switchIfEmpty(Mono.error(new BadRequestException("Password do not match")))
+            .switchIfEmpty(Mono.error(new BadRequestException("Passwords do not match")))
             .map(req -> {
                 UserEntity userEntity = userMapper.toUserEntity(req);
 
