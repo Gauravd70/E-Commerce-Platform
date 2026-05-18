@@ -24,7 +24,7 @@ public class SecurityConfiguration {
         return serverHttpSecurity
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(auth -> auth
-                .pathMatchers("/v1/login", "/v1/signup").permitAll()
+                .pathMatchers("/v1/login", "/v1/signup", "/actuator/health").permitAll()
                 .pathMatchers("/v1/logout").hasAnyRole(Roles.USER.name(), Roles.ADMIN.name())
                 .anyExchange().denyAll())
             .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
