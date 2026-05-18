@@ -7,7 +7,7 @@ on:
     paths:
       - 'commons-spring/**'
 jobs:
-  build:
+  ci_cd:
     runs-on: self-hosted
     defaults:
       run:
@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate settings.xml
-        uses: GauravD70/CI-Actions/maven-settings-action@v1
+        uses: Gauravd70/CI-Actions/maven-settings@v1
         with:
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           password: ${{ secrets.ARTIFACTORY_PASSWORD }}
