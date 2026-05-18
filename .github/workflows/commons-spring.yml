@@ -1,0 +1,32 @@
+name: Commons Spring CI/CD
+run-name: New changes found in repository ${{ github.repository }}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'commons-spring/**'
+jobs:
+  build:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: commons-spring
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21 
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Generate settings.xml
+        uses: GauravD70/CI-Actions/maven-settings-action@v1
+        with:
+          username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: Build and Deploy
+        run: mvn clean deploy
