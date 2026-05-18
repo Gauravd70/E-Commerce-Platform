@@ -1,0 +1,23 @@
+server:
+  servelet:
+    context-path: /auth
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+jwt:
+  secret: uM2low6PI0DELFl+4xBf7lyph25E/UKGI0gAIl2DyJU=
+  expiry:
+    access: 3600000
+    refresh: 604800000
+
+admin:
+  username: admin
+  password: Admin@123
