@@ -1,7 +1,7 @@
 package com.gauravd70.ecommerce.services;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,27 +16,23 @@ import com.gauravd70.commons.exceptions.UnauthorizedException;
 import com.gauravd70.commons.security.JwtType;
 import com.gauravd70.commons.security.JwtUtils;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
+import com.gauravd70.ecommerce.dtos.Roles;
 import com.gauravd70.ecommerce.dtos.SignUpRequest;
 import com.gauravd70.ecommerce.dtos.UserEntity;
 import com.gauravd70.ecommerce.mapper.UserMapper;
 import com.gauravd70.ecommerce.repositories.UserRepository;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
-    private UserRepository userRepository;
-    private UserMapper userMapper;
-    private PasswordEncoder passwordEncoder;
-    private JwtUtils jwtUtils;
-
-    public AuthServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtils = jwtUtils;
-    }
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @Override
     public Mono<ResponseEntity<Void>> onLogin(LoginRequest request) {
@@ -82,14 +78,7 @@ public class AuthServiceImpl implements AuthService {
         return Mono.just(request)
             .filter(req -> req.getPassword().equals(req.getConfirmPassword()))
             .switchIfEmpty(Mono.error(new BadRequestException("Passwords do not match")))
-            .map(req -> {
-                UserEntity userEntity = userMapper.toUserEntity(req);
-
-                userEntity.setPassword(passwordEncoder.encode(req.getPassword()));
-                userEntity.setRoles(Arrays.asList("user"));
-
-                return userEntity;
-            })
+            .map(req -> userMapper.toUserEntity(req, List.of(Roles.USER.name()), passwordEncoder.encode(req.getPassword())))
             .flatMap(user -> Mono.fromCallable(() -> userRepository.save(user)).subscribeOn(Schedulers.boundedElastic()))
             .onErrorResume(DataIntegrityViolationException.class, e -> Mono.error(new BadRequestException("Username already exists")))
             .map(userEntity -> GenericResponse.builder().message("User created successfully.").build());

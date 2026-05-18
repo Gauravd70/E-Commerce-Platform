@@ -6,10 +6,11 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.stereotype.Component;
+
+import com.gauravd70.commons.properties.JwtProperties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,20 +18,15 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Component
 public class JwtUtils {
-    @Value("${jwt.secret:DEFAULT_KEY}")
-    private String jwtSecret;
-
-    @Value("${jwt.expiry.access:3600000}")
-    private long accessTokenExpiryInMs;
-
-    @Value("${jwt.expiry.refresh:604800000}")
-    private long refreshTokenExpiryInMs;
+    private final JwtProperties jwtProperties;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
+        return Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.getSecret()));
     }
     
     private String create(String userId, Map<String, Object> claims, long expiryInMs) {
@@ -53,10 +49,10 @@ public class JwtUtils {
      */
     public String create(JwtType type, String userId, Map<String, Object> claims) {
         if(JwtType.REFRESH_TOKEN.equals(type)) {
-            return create(userId, claims, refreshTokenExpiryInMs);
+            return create(userId, claims, jwtProperties.getExpiry().getRefresh());
         }
 
-        return create(userId, claims, accessTokenExpiryInMs);
+        return create(userId, claims, jwtProperties.getExpiry().getAccess());
     }
 
     /**
@@ -73,9 +69,9 @@ public class JwtUtils {
         ResponseCookieBuilder responseCookieBuilder;
 
         if(JwtType.REFRESH_TOKEN.equals(type)) {
-            responseCookieBuilder = ResponseCookie.from(JwtType.REFRESH_TOKEN.name(), jwt).maxAge(refreshTokenExpiryInMs);
+            responseCookieBuilder = ResponseCookie.from(JwtType.REFRESH_TOKEN.name(), jwt).maxAge(jwtProperties.getExpiry().getRefresh());
         } else {
-            responseCookieBuilder = ResponseCookie.from(JwtType.ACCESS_TOKEN.name(), jwt).maxAge(accessTokenExpiryInMs);
+            responseCookieBuilder = ResponseCookie.from(JwtType.ACCESS_TOKEN.name(), jwt).maxAge(jwtProperties.getExpiry().getAccess());
         }
 
         return responseCookieBuilder.httpOnly(true).path("/").sameSite("Strict").build();

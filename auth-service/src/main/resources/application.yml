@@ -21,3 +21,7 @@ jwt:
   expiry:
     access: 3600000
     refresh: 604800000
+
+admin:
+  username: admin
+  password: Admin@123

@@ -10,6 +10,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
 import com.gauravd70.commons.filters.JwtFilter;
+import com.gauravd70.ecommerce.dtos.Roles;
 
 @Configuration
 public class SecurityConfiguration {
@@ -20,12 +21,15 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain getSecurityFilterChain(JwtFilter jwtFilter, ServerHttpSecurity serverHttpSecurity) {
-        return serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable)
-        .authorizeExchange(auth -> auth.pathMatchers("/v1/login", "/v1/signup").permitAll()
-            .anyExchange().authenticated())
-        .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-        .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-        .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-        .build();
+        return serverHttpSecurity
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .authorizeExchange(auth -> auth
+                .pathMatchers("/v1/login", "/v1/signup").permitAll()
+                .pathMatchers("/v1/logout").hasAnyRole(Roles.USER.name(), Roles.ADMIN.name())
+                .anyExchange().denyAll())
+            .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+            .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+            .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+            .build();
     }
 }
