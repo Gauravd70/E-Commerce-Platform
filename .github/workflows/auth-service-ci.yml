@@ -1,0 +1,56 @@
+name: Auth Service CI
+run-name: New changes found in repository ${{ github.repository }}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'auth-service/**'
+concurrency:
+  group: auth-service-ci
+  cancel-in-progress: true
+env:
+  IMAGE_NAME: gauravd70/ecommerce-auth
+  IMAGE_TAG: ${{ github.sha }}
+jobs:
+  ci:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: auth-service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      
+      - name: Generate settings.xml
+        uses: Gauravd70/CI-Actions/maven-settings@v1
+        with:
+          username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      
+      - name: Build
+        run: mvn clean package
+
+      - name: Docker Build
+        uses: Gauravd70/CI-Actions/docker-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tag: ${{ env.IMAGE_TAG }}
+
+      - name: DockerHub Login
+        uses: Gauravd70/CI-Actions/docker-login@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      
+      - name: Docker Push
+        uses: Gauravd70/CI-Actions/docker-push@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tag: ${{ env.IMAGE_TAG }}

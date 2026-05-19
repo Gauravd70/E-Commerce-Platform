@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-deployment
+  name: auth-service
 spec:
   replicas: 1
   selector:
@@ -15,8 +15,8 @@ spec:
         tier: backend
     spec:
       containers:
-        - name: auth
-          image: gauravd70/ecommerce-auth:1.0
+        - name: auth-service
+          image: gauravd70/ecommerce-auth:latest
           ports:
             - containerPort: 8080
           livenessProbe:

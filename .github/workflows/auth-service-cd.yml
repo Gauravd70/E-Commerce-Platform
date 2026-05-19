@@ -1,0 +1,45 @@
+name: Auth Service CD
+run-name: New docker image found for ${{ github.repository }}
+on:
+  workflow_run:
+    workflows: ["Auth Service CI"]
+    types:
+      - completed
+concurrency:
+  group: auth-service-cd
+  cancel-in-progress: true
+env:
+  NAMESPACE: 'ecommerce'
+  DEPLOYMENT: 'auth-service'
+  IMAGE_NAME: gauravd70/ecommerce-auth
+  IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
+jobs:
+  cd:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: auth-service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 'k8s deploy'
+        uses: Gauravd70/CI-Actions/k8s-apply@v2
+        with:
+          ns: ${{ env.NAMESPACE }}
+          k: 'k8s'
+      
+      - name: 'k8s set image'
+        uses: Gauravd70/CI-Actions/k8s-set-image@v2
+        with:
+          ns: ${{ env.NAMESPACE }}
+          deployment: ${{ env.DEPLOYMENT }}
+          image: ${{ env.IMAGE_NAME }}
+          tag: ${{ env.IMAGE_TAG }}
+
+      - name: 'k8s rollout status'
+        uses: Gauravd70/CI-Actions/k8s-rollout-status@v2
+        with:
+          ns: ${{ env.NAMESPACE }}
+          deployment: ${{ env.DEPLOYMENT }}
