@@ -31,7 +31,7 @@ jobs:
           k: 'k8s'
       
       - name: 'k8s set image'
-        uses: Gauravd70/CI-Actions/k8s-set-image@v2
+        uses: Gauravd70/CI-Actions/k8s-set-image@v4
         with:
           ns: ${{ env.NAMESPACE }}
           deployment: ${{ env.DEPLOYMENT }}
