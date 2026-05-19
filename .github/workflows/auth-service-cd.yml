@@ -25,10 +25,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 'k8s deploy'
-        uses: Gauravd70/CI-Actions/k8s-apply@v2
+        uses: Gauravd70/CI-Actions/k8s-apply@v6
         with:
           ns: ${{ env.NAMESPACE }}
-          k: 'k8s'
+          k: k8s/
       
       - name: 'k8s set image'
         uses: Gauravd70/CI-Actions/k8s-set-image@v4
