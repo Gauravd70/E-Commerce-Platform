@@ -38,10 +38,11 @@ jobs:
         run: mvn clean package
 
       - name: Docker Build
-        uses: Gauravd70/CI-Actions/docker-build@v2
+        uses: Gauravd70/CI-Actions/docker-build@v3
         with:
           image: ${{ env.IMAGE_NAME }}
           tag: ${{ env.IMAGE_TAG }}
+          context: auth-service
 
       - name: DockerHub Login
         uses: Gauravd70/CI-Actions/docker-login@v2
