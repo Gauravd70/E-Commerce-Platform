@@ -9,7 +9,7 @@ spec:
     http:
       paths:
       - path: /auth
-        path_type: Prefix
+        pathType: Prefix
         backend:
           service:
             name: auth-service
