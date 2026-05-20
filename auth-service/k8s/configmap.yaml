@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: auth-configmap
 data:
-  MYSQL_URL: jdbc:mysql://mysql-service.infra:3306/ecommerce?useSSL=false&serverTimezone=UTC
+  MYSQL_URL: jdbc:mysql://mysql-statefulset-0.mysql-service.infra:3306/ecommerce?useSSL=false&serverTimezone=UTC
