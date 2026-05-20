@@ -3,10 +3,4 @@ kind: ConfigMap
 metadata:
   name: auth-configmap
 data:
-  MYSQL_URL: jdbc:mysql://localhost:3306/your_database_name?useSSL=false&serverTimezone=UTC
-  MYSQL_ROOT_USERNAME: root
-  MYSQL_ROOT_PASSWORD: root@123
-  JWT_SECRET: 8ozzId5fCBrhVYvUu0jbSvVF3c69XsHV0LNJAMwpLUw=
-  ADMIN_USERNAME: admin
-  ADMIN_PASSWORD: adin@123
-
+  MYSQL_URL: jdbc:mysql://mysql:3306/ecommerce?useSSL=false&serverTimezone=UTC

@@ -38,4 +38,6 @@ spec:
             failureThreshold: 3
           envFrom:
             - configMapRef:
-                name: auth-configmap 
+                name: auth-configmap
+            - secretRef:
+                name: auth-secret
