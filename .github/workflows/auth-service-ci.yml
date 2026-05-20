@@ -55,3 +55,9 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tag: ${{ env.IMAGE_TAG }}
+
+      - name: Docker Push
+        uses: Gauravd70/CI-Actions/docker-push@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tag: 'latest'
