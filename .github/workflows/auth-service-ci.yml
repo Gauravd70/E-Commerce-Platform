@@ -38,7 +38,7 @@ jobs:
         run: mvn clean package
 
       - name: Docker Build
-        uses: Gauravd70/CI-Actions/docker-build@v3
+        uses: Gauravd70/CI-Actions/docker-build@v8
         with:
           image: ${{ env.IMAGE_NAME }}
           tag: ${{ env.IMAGE_TAG }}
