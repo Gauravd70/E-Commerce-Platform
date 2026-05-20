@@ -1,0 +1,20 @@
+name: MySQL CD
+run-name: Deploys MySQL as an infra service
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/mysql/**'
+jobs:
+  cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: k8s apply
+        uses: Gauravd70/CI-Actions/k8s-apply@v8
+        with:
+          ns: 'ecommerce'
+          k: 'infra/mysql'
