@@ -16,5 +16,5 @@ jobs:
       - name: k8s apply
         uses: Gauravd70/CI-Actions/k8s-apply@v8
         with:
-          ns: 'ecommerce'
+          ns: 'infra'
           k: 'infra/mysql'
