@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 env:
   NAMESPACE: 'ecommerce'
-  DEPLOYMENT: 'auth-service'
+  DEPLOYMENT: 'auth-deployment'
   IMAGE_NAME: gauravd70/ecommerce-auth
   IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
 jobs:
@@ -31,10 +31,11 @@ jobs:
           k: auth-service/k8s
       
       - name: 'k8s set image'
-        uses: Gauravd70/CI-Actions/k8s-set-image@v4
+        uses: Gauravd70/CI-Actions/k8s-set-image@v9
         with:
           ns: ${{ env.NAMESPACE }}
           deployment: ${{ env.DEPLOYMENT }}
+          container: 'auth'
           image: ${{ env.IMAGE_NAME }}
           tag: ${{ env.IMAGE_TAG }}
 

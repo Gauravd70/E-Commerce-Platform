@@ -1,7 +1,7 @@
-apiVersion: apps/v1
+apiVersion: app/v1
 kind: Deployment
 metadata:
-  name: auth-service
+  name: auth-deployment
 spec:
   replicas: 1
   selector:
@@ -15,19 +15,23 @@ spec:
         tier: backend
     spec:
       containers:
-        - name: auth-service
+        - name: auth
           image: gauravd70/ecommerce-auth:latest
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: auth-configmap
+            - secretRef:
+                name: auth-secret
           livenessProbe:
-            httpGet:
+            httpGet: 
               path: /actuator/health/liveness
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
-
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -36,8 +40,3 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 3
-          envFrom:
-            - configMapRef:
-                name: auth-configmap
-            - secretRef:
-                name: auth-secret
