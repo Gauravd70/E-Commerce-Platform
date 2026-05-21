@@ -26,7 +26,7 @@ spec:
                 name: auth-secret
           livenessProbe:
             httpGet: 
-              path: /actuator/health/liveness
+              path: /auth/actuator/health/liveness
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -34,7 +34,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /actuator/health/readiness
+              path: /auth/actuator/health/readiness
               port: 8080
             initialDelaySeconds: 20
             periodSeconds: 5

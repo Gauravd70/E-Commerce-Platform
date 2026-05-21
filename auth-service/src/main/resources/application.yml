@@ -1,8 +1,8 @@
 server:
   port: 8080
-  servlet:
-    context-path: /auth
 spring:
+  webflux:
+    base-path: /auth
   datasource:
     url: ${MYSQL_URL}
     username: ${MYSQL_ROOT_USERNAME}

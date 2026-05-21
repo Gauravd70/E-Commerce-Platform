@@ -1,8 +1,6 @@
-server:
-  servelet:
-    context-path: /auth
-
 spring:
+  webflux:
+    base-path: /auth
   jpa:
     hibernate:
       ddl-auto: update
