@@ -21,7 +21,7 @@ spec:
           ports:
             - containerPort: 3306
           envFrom:
-            secretRef:
+            - secretRef:
               - name: mysql-secret
           volumeMounts:
             - name: mysql-data

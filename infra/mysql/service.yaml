@@ -7,7 +7,7 @@ spec:
   selector:
     app: mysql
     tier: infra
-  port:
+  ports:
     - port: 3306
       targetPort: 3306
   
