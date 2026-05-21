@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -39,10 +40,13 @@ public class AuthApplication {
                                     .password(passwordEncoder.encode(adminProperties.getPassword()))
                                     .roles(List.of(Roles.ADMIN.name()))
                                     .build();
-
-        userRepository.save(userEntity);
-
-        log.info("Admin user created successfully");
+        
+        try {
+            userRepository.save(userEntity);
+            log.info("Admin user created successfully");
+        } catch(DataIntegrityViolationException e) {
+            log.info("Admin user already exists!");
+        }
     }
 
     public static void main(String[] args) {
