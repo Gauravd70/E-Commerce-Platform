@@ -1,17 +1,19 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Statefulset
 metadata:
   name: mysql-statefulset
 spec:
-  serviceName: mysql-service
+  serviceName: mysql
   replicas: 1
   selector:
     matchLabels:
       app: mysql
+      tier: infra
   template:
     metadata:
       labels:
         app: mysql
+        tier: infra
     spec:
       containers:
         - name: mysql
@@ -19,11 +21,20 @@ spec:
           ports:
             - containerPort: 3306
           envFrom:
-            - secretRef:
-                name: mysql-secret
+            secretRef:
+              - name: mysql-secret
           volumeMounts:
             - name: mysql-data
               mountPath: /var/lib/mysql
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - 127.0.0.1
+            initialDelaySeconds: 20
+            periodSeconds: 5
           readinessProbe:
             exec:
               command:
@@ -33,15 +44,6 @@ spec:
                 - 127.0.0.1
             initialDelaySeconds: 20
             periodSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-                - mysqladmin
-                - ping
-                - -h
-                - 127.0.0.1
-            initialDelaySeconds: 60
-            periodSeconds: 10
   volumeClaimTemplates:
     - metadata:
         name: mysql-data
@@ -51,3 +53,4 @@ spec:
         resources:
           requests:
             storage: 5Gi
+    
