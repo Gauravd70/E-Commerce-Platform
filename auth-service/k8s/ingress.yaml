@@ -5,8 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: myecommerce.com
-      http:
+    - http:
         paths:
           - path: /auth
             pathType: Prefix
