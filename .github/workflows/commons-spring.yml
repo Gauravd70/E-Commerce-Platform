@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'commons-spring/**'
+      - 'commons-spring/src/**'
+      - 'commons-spring/pom.xml'
 jobs:
   ci_cd:
     runs-on: self-hosted

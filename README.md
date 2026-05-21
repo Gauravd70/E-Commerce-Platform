@@ -412,5 +412,9 @@ This service manages all the reviews for the products.
 ```
   
 # Deployment
-- Services are built using their respective Dockerfile
-- Services are deployed on Kubernetes
+- Components of each service
+    - Dockerfile: For building image
+    - k8s manifest: For deploying on minikube
+    - GitHub workflows: For CI and CD
+
+In this project we are following a push based CI/CD approach where a github workflow gets triggered when certain files being watched by the workflow changes. On detecting a change the CI pipeline is triggered which builds the service, creates images tagged using the commit sha and latest, push the image to DockerHub. Once the CI pipeline completes successfully it triggers the CD pipeline which deploys the service. 

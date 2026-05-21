@@ -5,7 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'auth-service/**'
+      - 'auth-service/k8s/**'
+      - 'auth-service/src/**'
+      - 'auth-service/Dockerfile'
+      - 'auth-service/pom.xml'
 concurrency:
   group: auth-service-ci
   cancel-in-progress: true
