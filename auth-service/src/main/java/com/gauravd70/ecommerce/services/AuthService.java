@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
+import com.gauravd70.ecommerce.dtos.Roles;
 import com.gauravd70.ecommerce.dtos.SignUpRequest;
 
 import reactor.core.publisher.Mono;
@@ -26,10 +27,11 @@ public interface AuthService {
     public Mono<ResponseEntity<Void>> onLogout(String userId);
 
     /**
-     * Sign up a new user
+     * Sign up a new user or seller
      * 
-     * @param request {@link SignUpRequest}
+     * @param request request {@link SignUpRequest}
+     * @param role {@link Roles}
      * @return {@link Mono}<{@link GenericResponse}>
      */
-    public Mono<GenericResponse> onSignUp(SignUpRequest request);
+    public Mono<GenericResponse> onSignUp(SignUpRequest request, Roles role);
 }

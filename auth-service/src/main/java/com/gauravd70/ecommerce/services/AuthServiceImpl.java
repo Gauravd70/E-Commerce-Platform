@@ -74,11 +74,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Mono<GenericResponse> onSignUp(SignUpRequest request) {
+    public Mono<GenericResponse> onSignUp(SignUpRequest request, Roles role) {
         return Mono.just(request)
             .filter(req -> req.getPassword().equals(req.getConfirmPassword()))
             .switchIfEmpty(Mono.error(new BadRequestException("Passwords do not match")))
-            .map(req -> userMapper.toUserEntity(req, List.of(Roles.USER.name()), passwordEncoder.encode(req.getPassword())))
+            .map(req -> userMapper.toUserEntity(req, List.of(role.name()), passwordEncoder.encode(req.getPassword())))
             .flatMap(user -> Mono.fromCallable(() -> userRepository.save(user)).subscribeOn(Schedulers.boundedElastic()))
             .onErrorResume(DataIntegrityViolationException.class, e -> Mono.error(new BadRequestException("Username already exists")))
             .map(userEntity -> GenericResponse.builder().message("User created successfully.").build());

@@ -91,7 +91,7 @@ Response Body:
 
 401 UNAUTHORIZED
 ```
-### POST /v1/signup
+### POST /v1/signup/user or /v1/signup/user
 ```
 Request Body: 
 {
@@ -120,11 +120,12 @@ Response Body:
 ## Schema
 
 ### Users Table
-- id (Auto increment)
+- id int (Auto increment)
 - firstName varchar
 - lastName varchar
 - username varchar (Primary Key)
 - password varchar (stored as SHA256 hash)
+- roles
 
 ### JWT token
 ```

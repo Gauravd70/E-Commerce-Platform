@@ -60,7 +60,7 @@ public class AuthControllerTest {
     void givenLoginRequest_whenIncorrectCredentials_thenReturn401Unauthorized() throws JsonProcessingException {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
 
-        webTestClient.post().uri("/v1/signup").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest);
+        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest);
 
         LoginRequest loginRequest = LoginRequest.builder().username("test@gmail.com").password("Abcd@1234").build();
 
@@ -74,7 +74,7 @@ public class AuthControllerTest {
     void givenLoginRequest_whenSignedUp_thenReturn200OK() throws JsonProcessingException {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test2@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
 
-        webTestClient.post().uri("/v1/signup").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
+        webTestClient.post().uri("/v1/signup/seller").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
             .exchange()
             .expectStatus().isOk();
 
@@ -91,11 +91,11 @@ public class AuthControllerTest {
     void givenSignUpRequest_whenEmailExists_thenReturn400BadRequest() throws JsonProcessingException {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test3@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
 
-        webTestClient.post().uri("/v1/signup").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
+        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
             .exchange()
             .expectStatus().isOk();
 
-        webTestClient.post().uri("/v1/signup").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
+        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
             .exchange()
             .expectStatus().isBadRequest()
             .expectBody().json(objectMapper.writeValueAsString(GenericResponse.builder().message("Username already exists").build()));
@@ -105,7 +105,7 @@ public class AuthControllerTest {
     void givenSignUpRequest_whenPasswordMismatch_thenReturn400BadRequest() throws JsonProcessingException {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@1234").build();
 
-        webTestClient.post().uri("/v1/signup").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
+        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
             .exchange()
             .expectStatus().isBadRequest()
             .expectBody().json(objectMapper.writeValueAsString(GenericResponse.builder().message("Passwords do not match").build()));
@@ -123,7 +123,7 @@ public class AuthControllerTest {
     void givenLogoutRequest_whenSuccess_thenReturn200OK() {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
 
-        webTestClient.post().uri("/v1/signup").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
+        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
             .exchange()
             .expectStatus().isOk();
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
+import com.gauravd70.ecommerce.dtos.Roles;
 import com.gauravd70.ecommerce.dtos.SignUpRequest;
 import com.gauravd70.ecommerce.services.AuthService;
 
@@ -34,8 +35,13 @@ public class AuthController {
         return authService.onLogout(accessTokenClaims.getSubject());
     }
 
-    @PostMapping(value = "/signup", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Mono<GenericResponse> onSignUp(@Valid @RequestBody SignUpRequest signUpRequest) {
-        return authService.onSignUp(signUpRequest);
+    @PostMapping(value = "/signup/user", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Mono<GenericResponse> onSignUpUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        return authService.onSignUp(signUpRequest, Roles.USER);
+    }
+
+    @PostMapping(value = "/signup/seller", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public Mono<GenericResponse> onSignUpSeller(@Valid @RequestBody SignUpRequest signUpRequest) {
+        return authService.onSignUp(signUpRequest, Roles.SELLER);
     }
 }
