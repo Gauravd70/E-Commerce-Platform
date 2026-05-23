@@ -11,4 +11,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class GenericResponse {
     private String message;
+    private String id;
 }
