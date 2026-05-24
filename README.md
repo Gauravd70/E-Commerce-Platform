@@ -3,6 +3,7 @@
 
 # Contents
 - [Tech Stack](#tech-stack)
+- [Setup](#setup)
 - [High Level Design (HLD)](#high-level-design-hld)
     - [Functional Requirements](#functional-requirements)
     - [Non-Functional Requirements](#non-functional-requirements)
@@ -10,7 +11,7 @@
 - [Deployment](#deployment)
 
 # Tech stack
-- Java 21
+- Java 17
 - SpringBoot 4.0.6
 - MySQL 8.0.36
 - MongoDB 8.3.2
@@ -19,6 +20,14 @@
 - Prometheus
 - Docker
 - Kubernetes
+
+# Setup
+- Ubuntu Server with 16GB RAM and 512GB SSD
+- Self hosted GitHub Runner
+- JFrog Artifactory OSS for managing custom dependencies
+- Docker Engine
+- Minikube
+- Nginx
 
 # High Level Design (HLD)
 ## Functional Requirements
@@ -36,13 +45,7 @@
 6. User should be able to checkout the card
 7. User should be able to make the payment and confirm the order.
 8. Users should get product recommendations based on their activity
-
-### Listing
-1. User should be able to list a new product
-2. User should be able to see all their listings
-3. User should be able to remove a listing
-4. Only logged in users should be able to list
-5. User should be able to view product analytics
+9. User should be able to view the different prices offered by different sellers for the same product
 
 ### Observability
 1. Platform admin should be able to see the system performance metrics
@@ -65,7 +68,8 @@
 - [Product Service](product-service/README.md)
 - [Search Service](#search-service)
 - [Recommendation Service](#recommendation-service)
-- [Listing Service](#listing-service)
+- [Catalog Service](#catalog-service)
+- [Inventory Service](#inventory-service)
 - [Checkout Service](#checkout-service)
 - [Payment Gateway](#payment-gateway)
 - [Cart Service](#cart-service)
@@ -115,101 +119,11 @@ Response Body:
 ## Recommendation Service
 This service is responsible for providing product suggestions based on the users past activities.
 
-## Listing Service
-This service is responsible for providing APIs to manage product listings.
+## Catalog Service
+This service is responsible for normalization of the product and group them to provide the user with the different prices offered by different sellers for the same product
 
-### API Specs
-
-- POST /v1/listings
-```
-Request Body: 
-{
-    "thumbnail": "image URL",
-    "name": "asdasd",
-    "images": [url1,....url2],
-    "price": 20.0,
-    "quantity": 5,
-    "category": "asbcd",
-    "seller": "asdava",
-    "sellerId": "abcd123",
-    "description": "adsanda"
-}
-
-Response Body:
-200 OK {
-    "message":"Listing created successfully"
-}
-```
-- POST /v1/listings/{sellerId}
-```
-Response Body:
-{
-    products: [
-        {
-            "thumbnail": "image URL",
-            "name": "asdasd"
-        }
-        .
-        .
-        .,
-        {
-            "thumbnail": "image URL",
-            "name": "asdasd"
-        }
-    ]
-}
-```
-- GET /v1/listings/{sellerId}/{productId}
-```
-Response Body: 
-200 OK {
-    "thumbnail": "image URL",
-    "name": "asdasd",
-    "images": [url1,....url2],
-    "price": 20.0,
-    "quantity": 5,
-    "category": "asbcd",
-    "description": "adsanda"
-}
-
-400 BAD REQUEST {
-    "message": "No product found"
-}
-```
-- PUT /v1/listings/{sellerId}/{productId} (partial updates)
-```
-Request Body:
-{
-    "thumbnail": "image URL",
-    "name": "asdasd",
-    "images": [url1,....url2],
-    "price": 20.0,
-    "quantity": 5,
-    "category": "asbcd",
-    "description": "adsanda"
-}
-
-Response Body:
-200 OK {
-    "message": "Listing updated successfully"
-}
-
-400 BAD REQUEST {
-    "message": "No product found"
-}
-```
-
-- DELETE /v1/listings/{sellerId}/{productId}
-```
-Response Body:
-200 OK {
-    "message": "Listing deleted successfully"
-}
-
-400 BAD REQUEST {
-    "message": "No product found"
-}
-```
+## Inventory Service
+Manages the products inventory
 
 ## Checkout Service
 This service is responsible for managing the checkout session. Starts a checkout session which keeps tracks of the various steps completed in the checkout session. The steps involved in a checkout are as belows:
