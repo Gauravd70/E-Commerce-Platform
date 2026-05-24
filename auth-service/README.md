@@ -27,6 +27,9 @@ This service is responsible for authenticating and authorizing the users.
 - jjwt-api
 - jjwt-impl
 - jjwt-jackson
+- flyway-core
+- flyway-mysql
+- spring-boot-starter-flyway
 
 ### Login Flow
 Login API skips the JWT validation filter since it does not have any access token and is configured to be permitted at all times in the SpringBoot security filter chain.

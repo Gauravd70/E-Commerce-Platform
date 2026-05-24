@@ -26,7 +26,7 @@ public class UserEntity {
     private String username;
     private String password;
     @Column(name = "created_at")
-    private long createdAt;
+    private Long createdAt;
     @Column(name = "updated_at")
-    private long updatedAt;
+    private Long updatedAt;
 }
