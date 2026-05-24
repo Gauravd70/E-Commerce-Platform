@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup maven
-        uses: Gauravd70/CI-Actions/maven-setup@v10
+        uses: Gauravd70/CI-Actions/maven-setup@v11
         with:
           cacert: ${{ secrets.MKCERT_CA }}
 
