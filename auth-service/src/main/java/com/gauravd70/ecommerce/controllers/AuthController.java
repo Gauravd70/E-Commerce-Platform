@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gauravd70.commons.dtos.GenericResponse;
+import com.gauravd70.commons.exceptions.BadRequestException;
+import com.gauravd70.commons.exceptions.UnauthorizedException;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
-import com.gauravd70.ecommerce.dtos.Roles;
 import com.gauravd70.ecommerce.dtos.SignUpRequest;
 import com.gauravd70.ecommerce.services.AuthService;
 
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,22 +26,17 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(value = "/login", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.TEXT_PLAIN_VALUE})
-    public Mono<ResponseEntity<Void>> onLogin(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Void> onLogin(@Valid @RequestBody LoginRequest loginRequest) throws UnauthorizedException {
         return authService.onLogin(loginRequest);
     }
 
     @PostMapping(value = "/logout", produces = {MediaType.TEXT_PLAIN_VALUE})
-    public Mono<ResponseEntity<Void>> onLogout(@RequestAttribute(value = "ACCESS_TOKEN") Claims accessTokenClaims) {
+    public ResponseEntity<Void> onLogout(@RequestAttribute(value = "ACCESS_TOKEN") Claims accessTokenClaims) throws UnauthorizedException {
         return authService.onLogout(accessTokenClaims.getSubject());
     }
 
-    @PostMapping(value = "/signup/user", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Mono<GenericResponse> onSignUpUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        return authService.onSignUp(signUpRequest, Roles.USER);
-    }
-
-    @PostMapping(value = "/signup/seller", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public Mono<GenericResponse> onSignUpSeller(@Valid @RequestBody SignUpRequest signUpRequest) {
-        return authService.onSignUp(signUpRequest, Roles.SELLER);
+    @PostMapping(value = "/signup", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public GenericResponse onSignUpUser(@Valid @RequestBody SignUpRequest signUpRequest) throws BadRequestException {
+        return authService.onSignUp(signUpRequest);
     }
 }

@@ -1,24 +1,23 @@
 package com.gauravd70.ecommerce.controllers;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.ExchangeResult;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
@@ -26,124 +25,169 @@ import com.gauravd70.ecommerce.dtos.SignUpRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@AutoConfigureWebTestClient
 @Testcontainers
+@AutoConfigureMockMvc
 public class AuthControllerTest {
     @Container
     @ServiceConnection
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.36"));
 
     @Autowired
-    WebTestClient webTestClient;
+    MockMvc mockMvc;
     
     ObjectMapper objectMapper = new ObjectMapper();
 
     @ParameterizedTest
     @MethodSource("com.gauravd70.ecommerce.dataproviders.AuthControllerDataProvider#invalidLoginRequest")
     void givenLoginRequest_whenInvalid_thenReturn400BadRequest(LoginRequest loginRequest) throws Exception {
-        webTestClient.post().uri("/v1/login").contentType(MediaType.APPLICATION_JSON).bodyValue(loginRequest)
-            .exchange()
-            .expectStatus().isBadRequest();
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
-    void givenLoginRequest_whenNotSignedUp_thenReturn401Unauthorized() throws JsonProcessingException {
+    void givenLoginRequest_whenNotSignedUp_thenReturn401Unauthorized() throws Exception {
         LoginRequest request = LoginRequest.builder().username("abcd123").password("abcd123").build();
 
-        webTestClient.post().uri("/v1/login").contentType(MediaType.APPLICATION_JSON).bodyValue(request)
-            .exchange()
-            .expectStatus().isUnauthorized()
-            .expectBody().json(objectMapper.writeValueAsString(GenericResponse.builder().message("Incorrect username or passoword.").build()));
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+            .andReturn()
+            .getResponse()
+            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Incorrect username or passoword.").build()));
     }
 
     @Test
-    void givenLoginRequest_whenIncorrectCredentials_thenReturn401Unauthorized() throws JsonProcessingException {
-        SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
+    void givenLoginRequest_whenIncorrectCredentials_thenReturn401Unauthorized() throws Exception {
+        SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").role("ROLE_CUSTOMER").build();
 
-        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest);
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)));
 
         LoginRequest loginRequest = LoginRequest.builder().username("test@gmail.com").password("Abcd@1234").build();
 
-        webTestClient.post().uri("/v1/login").contentType(MediaType.APPLICATION_JSON).bodyValue(loginRequest)
-            .exchange()
-            .expectStatus().isUnauthorized()
-            .expectBody().json(objectMapper.writeValueAsString(GenericResponse.builder().message("Incorrect username or passoword.").build()));
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(loginRequest)))
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+            .andReturn()
+            .getResponse()
+            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Incorrect username or passoword.").build()));
     }
 
     @Test
-    void givenLoginRequest_whenSignedUp_thenReturn200OK() throws JsonProcessingException {
-        SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test2@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
+    void givenLoginRequest_whenSignedUp_thenReturn200OK() throws Exception {
+        SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test2@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").role("ROLE_SELLER").build();
 
-        webTestClient.post().uri("/v1/signup/seller").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
-            .exchange()
-            .expectStatus().isOk();
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk());
 
         LoginRequest loginRequest = LoginRequest.builder().username("test2@gmail.com").password("Abcd@123").build();
 
-        webTestClient.post().uri("/v1/login").contentType(MediaType.APPLICATION_JSON).bodyValue(loginRequest)
-            .exchange()
-            .expectStatus().isOk()
-            .expectCookie().exists("ACCESS_TOKEN")
-            .expectCookie().exists("REFRESH_TOKEN");
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(loginRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.cookie().exists("ACCESS_TOKEN"))
+            .andExpect(MockMvcResultMatchers.cookie().exists("REFRESH_TOKEN"));
     }
 
     @Test
-    void givenSignUpRequest_whenEmailExists_thenReturn400BadRequest() throws JsonProcessingException {
-        SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test3@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
+    void givenSignUpRequest_whenEmailExists_thenReturn400BadRequest() throws Exception {
+        SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test3@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").role("ROLE_CUSTOMER").build();
 
-        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
-            .exchange()
-            .expectStatus().isOk();
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk());
 
-        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
-            .exchange()
-            .expectStatus().isBadRequest()
-            .expectBody().json(objectMapper.writeValueAsString(GenericResponse.builder().message("Username already exists").build()));
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest())
+            .andReturn()
+            .getResponse()
+            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Username already exists").build()));
     }
 
     @Test
-    void givenSignUpRequest_whenPasswordMismatch_thenReturn400BadRequest() throws JsonProcessingException {
-        SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@1234").build();
+    void givenSignUpRequest_whenPasswordMismatch_thenReturn400BadRequest() throws Exception {
+        SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@1234").role("ROLE_CUSTOMER").build();
 
-        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
-            .exchange()
-            .expectStatus().isBadRequest()
-            .expectBody().json(objectMapper.writeValueAsString(GenericResponse.builder().message("Passwords do not match").build()));
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest())
+            .andReturn()
+            .getResponse()
+            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Passwords do not match").build()));
     }
 
      @Test
-    void givenLogoutRequest_whenNoAccessToken_thenReturn401Unauthorized() {
-        webTestClient.post().uri("/v1/logout")
-            .exchange()
-            .expectStatus().isUnauthorized();
+    void givenLogoutRequest_whenNoAccessToken_thenReturn401Unauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/v1/logout"))
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
 
     @Test
-    void givenLogoutRequest_whenSuccess_thenReturn200OK() {
-        SignUpRequest signUpRequest = SignUpRequest.builder().firstName("test").lastName("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").build();
+    void givenLogoutRequest_whenSuccess_thenReturn200OK() throws Exception {
+        SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@123").role("ROLE_CUSTOMER").build();
 
-        webTestClient.post().uri("/v1/signup/user").contentType(MediaType.APPLICATION_JSON).bodyValue(signUpRequest)
-            .exchange()
-            .expectStatus().isOk();
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk());
 
         LoginRequest loginRequest = LoginRequest.builder().username("test4@gmail.com").password("Abcd@123").build();
 
-        ExchangeResult result = webTestClient.post().uri("/v1/login").contentType(MediaType.APPLICATION_JSON).bodyValue(loginRequest)
-                                    .exchange()
-                                    .expectStatus().isOk()
-                                    .expectCookie().exists("ACCESS_TOKEN")
-                                    .expectCookie().exists("REFRESH_TOKEN")
-                                    .returnResult();
+        MvcResult mvcResult = mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(loginRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.cookie().exists("ACCESS_TOKEN"))
+            .andExpect(MockMvcResultMatchers.cookie().exists("REFRESH_TOKEN"))
+            .andReturn();
 
-        webTestClient.post().uri("/v1/logout").cookie("ACCESS_TOKEN", result.getResponseCookies().getFirst("ACCESS_TOKEN").getValue())
-            .exchange()
-            .expectStatus().isOk()
-            .expectCookie().exists("ACCESS_TOKEN")
-            .expectCookie().valueEquals("ACCESS_TOKEN", "")
-            .expectCookie().maxAge("ACCESS_TOKEN", Duration.ofSeconds(0))
-            .expectCookie().exists("REFRESH_TOKEN")
-            .expectCookie().valueEquals("REFRESH_TOKEN", "")
-            .expectCookie().maxAge("REFRESH_TOKEN", Duration.ofSeconds(0));
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .cookie(mvcResult.getResponse().getCookie("ACCESS_TOKEN"))
+                .content(objectMapper.writeValueAsBytes(loginRequest)))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.cookie().exists("ACCESS_TOKEN"))
+            .andExpect(MockMvcResultMatchers.cookie().value("ACCESS_TOKEN", ""))
+            .andExpect(MockMvcResultMatchers.cookie().maxAge("ACCESS_TOKEN", 0))
+            .andExpect(MockMvcResultMatchers.cookie().exists("REFRESH_TOKEN"))
+            .andExpect(MockMvcResultMatchers.cookie().value("REFRESH_TOKEN", ""))
+            .andExpect(MockMvcResultMatchers.cookie().maxAge("REFRESH_TOKEN", 0));
     }
 }

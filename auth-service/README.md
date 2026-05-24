@@ -9,21 +9,24 @@ This service is responsible for authenticating and authorizing the users.
 
 ## Low Level Design (LLD)
 ### Dependencies
-- spring-boot-starter-webFlux: Implementing reactive REST APIs
+- spring-boot-starter-web: Implementing MVC based REST APIs
 - spring-boot-starter-validation: Validating API request body 
 - spring-boot-starter-data-jpa: Implementing data access layer 
 - mysql-connector-j: MySQL Connector implementation required by Data JPA
 - spring-boot-starter-actuator: Implementing service health APIs
 - spring-boot-starter-security: Implementing authentication and authorization 
 - spring-boot-starter-test: Writing integration tests for APIs
+- spring-boot-starter-webmvc-test: Create MockMvc client
 - spring-boot-testcontainers: Managing test containers for integration tests.
-- spring-boot-webtestclient: Creating reactive REST clients for tests
 - junit-jupiter: Annotations for wiring Junit with Test containers
 - mysql: Implementation for MySQL test containers 
 - lombok: Generating boiler plate code
 - commons-spring: [refer]()
 - mapstruct: Generating mappers from one model to another.
 - jacoco-maven-plugin: Creating code coverage reports
+- jjwt-api
+- jjwt-impl
+- jjwt-jackson
 
 ### Login Flow
 Login API skips the JWT validation filter since it does not have any access token and is configured to be permitted at all times in the SpringBoot security filter chain.
@@ -119,13 +122,22 @@ Response Body:
 
 ## Schema
 
-### Users Table
-- id int (Auto increment)
-- firstName varchar
-- lastName varchar
-- username varchar (Primary Key)
-- password varchar (stored as SHA256 hash)
-- roles
+### users table
+- id INT AUTO_INCREMENT PRIMARY KEY
+- firstname VARCHAR(20) NOT NULL
+- lastname VARCHAR(20)
+- username VARCHAR(100) NOT NULL UNIQUE
+- password VARCHAR(256) NOT NULL
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+### roles table
+- id INT AUTO_INCREMENT PRIMARY KEY
+- name VARCHAR(20) NOT NULL UNIQUE
+
+### user_role_mappings table
+- user_id INT NOT NULL FOREIGN KEY
+- role_id INT NOT NULL FOREIGN KEY
 
 ### JWT token
 ```

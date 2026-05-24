@@ -2,15 +2,20 @@ package com.gauravd70.ecommerce.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.gauravd70.commons.filters.JwtFilter;
-import com.gauravd70.ecommerce.dtos.Roles;
+import com.gauravd70.ecommerce.filters.JwtFilter;
 
 @Configuration
 public class SecurityConfiguration {
@@ -20,16 +25,22 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityWebFilterChain getSecurityFilterChain(JwtFilter jwtFilter, ServerHttpSecurity serverHttpSecurity) {
-        return serverHttpSecurity
-            .csrf(ServerHttpSecurity.CsrfSpec::disable)
-            .authorizeExchange(auth -> auth
-                .pathMatchers("/v1/login", "/v1/signup/**", "/actuator/health/**").permitAll()
-                .pathMatchers("/v1/logout").hasAnyRole(Roles.USER.name(), Roles.ADMIN.name(), Roles.SELLER.name())
-                .anyExchange().denyAll())
-            .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-            .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-            .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+    public SecurityFilterChain getSecurityFilterChain(JwtFilter jwtFilter, HttpSecurity httpSecurity) {
+        return httpSecurity
+            .csrf(CsrfConfigurer::disable)
+            .httpBasic(HttpBasicConfigurer::disable)
+            .formLogin(FormLoginConfigurer::disable)
+            .logout(LogoutConfigurer::disable)
+            .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> response.sendError(HttpStatus.UNAUTHORIZED.value())))
+            .anonymous(AbstractHttpConfigurer::disable)
+            .sessionManagement(session ->
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> 
+                auth.requestMatchers("/v1/login", "/v1/signup", "/actuator/health/**").permitAll()
+                .requestMatchers("/v1/logout").hasAnyRole("ADMIN", "CUSTOMER", "SELLER")
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 }

@@ -1,6 +1,5 @@
 package com.gauravd70.ecommerce.dtos;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,21 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "roles")
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class RoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String firstname;
-    private String lastname;
-    private String username;
-    private String password;
-    @Column(name = "created_at")
-    private long createdAt;
-    @Column(name = "updated_at")
-    private long updatedAt;
+    private String name;
 }

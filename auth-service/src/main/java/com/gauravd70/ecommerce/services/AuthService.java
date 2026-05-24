@@ -3,35 +3,36 @@ package com.gauravd70.ecommerce.services;
 import org.springframework.http.ResponseEntity;
 
 import com.gauravd70.commons.dtos.GenericResponse;
+import com.gauravd70.commons.exceptions.BadRequestException;
+import com.gauravd70.commons.exceptions.UnauthorizedException;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
-import com.gauravd70.ecommerce.dtos.Roles;
 import com.gauravd70.ecommerce.dtos.SignUpRequest;
-
-import reactor.core.publisher.Mono;
 
 public interface AuthService {
     /**
      * Logs in the user and return the session cookie
      * 
      * @param request {@link LoginRequest}
-     * @return {@link Mono}<{@link ResponseEntity}>
+     * @return {@link ResponseEntity}<{@link Void}>
+     * @throws UnauthorizedException
      */
-    public Mono<ResponseEntity<Void>> onLogin(LoginRequest request);
+    public ResponseEntity<Void> onLogin(LoginRequest request) throws UnauthorizedException;
 
     /**
      * Logs out the user
      * 
      * @param userId {@link String}
-     * @return {@link Mono}<{@link ResponseEntity}>
+     * @return {@link ResponseEntity}<{@link Void}>
+     * @throws UnauthorizedException
      */
-    public Mono<ResponseEntity<Void>> onLogout(String userId);
+    public ResponseEntity<Void> onLogout(String userId) throws UnauthorizedException;
 
     /**
      * Sign up a new user or seller
      * 
      * @param request request {@link SignUpRequest}
-     * @param role {@link Roles}
-     * @return {@link Mono}<{@link GenericResponse}>
+     * @return {@link GenericResponse}
+     * @throws BadRequestException
      */
-    public Mono<GenericResponse> onSignUp(SignUpRequest request, Roles role);
+    public GenericResponse onSignUp(SignUpRequest request) throws BadRequestException;
 }

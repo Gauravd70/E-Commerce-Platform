@@ -1,7 +1,5 @@
 package com.gauravd70.ecommerce;
 
-import java.util.List;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -11,10 +9,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.gauravd70.ecommerce.dtos.Roles;
+import com.gauravd70.ecommerce.dtos.RoleEntity;
 import com.gauravd70.ecommerce.dtos.UserEntity;
+import com.gauravd70.ecommerce.dtos.UserRoleMappingEntity;
+import com.gauravd70.ecommerce.dtos.UserRoleMappingId;
 import com.gauravd70.ecommerce.properties.AdminProperties;
-import com.gauravd70.ecommerce.repositories.UserRepository;
+import com.gauravd70.ecommerce.repositories.RolesRepository;
+import com.gauravd70.ecommerce.repositories.UserRoleMappingsRepository;
+import com.gauravd70.ecommerce.repositories.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,24 +27,30 @@ import lombok.extern.slf4j.Slf4j;
 @EnableConfigurationProperties
 @Slf4j
 public class AuthApplication {
-    private final UserRepository userRepository;
+    private final UsersRepository userRepository;
+    private final RolesRepository rolesRepository;
+    private final UserRoleMappingsRepository userRoleMappingsRepository;
     private final AdminProperties adminProperties;
     private final PasswordEncoder passwordEncoder;
 
     @EventListener(value = ApplicationStartedEvent.class)
     public void onApplicationStarted(ApplicationStartedEvent event) {
-        log.info("Creating admin user");
-
         UserEntity userEntity = UserEntity.builder()
-                                    .firstName(adminProperties.getUsername())
-                                    .lastName(adminProperties.getUsername())
+                                    .firstname(adminProperties.getUsername())
+                                    .lastname(adminProperties.getUsername())
                                     .username(adminProperties.getUsername())
                                     .password(passwordEncoder.encode(adminProperties.getPassword()))
-                                    .roles(List.of(Roles.ADMIN.name()))
                                     .build();
         
         try {
-            userRepository.save(userEntity);
+            userEntity = userRepository.save(userEntity);
+
+            RoleEntity adminRole = rolesRepository.findByName("ROLE_ADMIN").get();
+
+            UserRoleMappingEntity userRoleMappingEntity = UserRoleMappingEntity.builder().id(UserRoleMappingId.builder().userId(userEntity.getId()).roleId(adminRole.getId()).build()).build();
+
+            userRoleMappingsRepository.save(userRoleMappingEntity);            
+
             log.info("Admin user created successfully");
         } catch(DataIntegrityViolationException e) {
             log.info("Admin user already exists!");

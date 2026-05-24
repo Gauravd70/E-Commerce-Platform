@@ -62,7 +62,7 @@
 
 ## Services
 - [Auth Service](auth-service/README.md)
-- [Product Service](#product-service)
+- [Product Service](product-service/README.md)
 - [Search Service](#search-service)
 - [Recommendation Service](#recommendation-service)
 - [Listing Service](#listing-service)
@@ -70,57 +70,6 @@
 - [Payment Gateway](#payment-gateway)
 - [Cart Service](#cart-service)
 - [Analytics Service](#analytics-service)
-
-## Product Service
-This service is responsible for showing the products catalogue and viewing the product details.
-
-### API Specs
-
-- GET /v1/products
-```
-Query params:
-sortBy = (price|rating)
-sortOrder = (asc|desc)
-
-Response Body: 
-{
-    products: [
-        {
-            "id": "abcd123",
-            "thumbnail": "image URL",
-            "name": "asdasd",
-            "price": 20.0
-        },
-        .
-        .
-        .,
-        {
-            "id": "abcd123",
-            "thumbnail": "image URL",
-            "name": "asdasd",
-            "price": 20.0
-        }
-    ],
-    "count": 20,
-    "totalCount": 100,
-    "firstOffset": "abcd123",
-    "lastOffset": "abcd123"
-}
-```
-- GET /v1/products/{productId}
-```
-{
-    "id": "abcd123",
-    "thumbnail": "image URL",
-    "name": "asdasd",
-    "images": [url1,....url2],
-    "price": 20.0,
-    "quantity": 5,
-    "category": "asbcd",
-    "seller": "asdabd",
-    "description": "adsanda"
-}
-```
 
 ## Search Service
 This service is responsible for searching product based on the provided input. This service uses fuzzy search to get the most probable word for the provided input and return the search result for it. It also makes use of elastic search to search for text based product search. 

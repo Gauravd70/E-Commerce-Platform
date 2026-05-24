@@ -1,8 +1,8 @@
 package com.gauravd70.ecommerce.services;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -13,74 +13,93 @@ import org.springframework.stereotype.Service;
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.commons.exceptions.BadRequestException;
 import com.gauravd70.commons.exceptions.UnauthorizedException;
-import com.gauravd70.commons.security.JwtType;
-import com.gauravd70.commons.security.JwtUtils;
 import com.gauravd70.ecommerce.dtos.LoginRequest;
-import com.gauravd70.ecommerce.dtos.Roles;
+import com.gauravd70.ecommerce.dtos.RoleEntity;
 import com.gauravd70.ecommerce.dtos.SignUpRequest;
 import com.gauravd70.ecommerce.dtos.UserEntity;
+import com.gauravd70.ecommerce.dtos.UserRoleMappingEntity;
+import com.gauravd70.ecommerce.dtos.UserRoleMappingId;
+import com.gauravd70.ecommerce.filters.JwtType;
+import com.gauravd70.ecommerce.filters.JwtUtils;
 import com.gauravd70.ecommerce.mapper.UserMapper;
-import com.gauravd70.ecommerce.repositories.UserRepository;
+import com.gauravd70.ecommerce.repositories.RolesRepository;
+import com.gauravd70.ecommerce.repositories.UserRoleMappingsRepository;
+import com.gauravd70.ecommerce.repositories.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
+    private final RolesRepository rolesRepository;
+    private final UserRoleMappingsRepository userRoleMappingsRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
     @Override
-    public Mono<ResponseEntity<Void>> onLogin(LoginRequest request) {
-        return Mono.fromCallable(() -> userRepository.findByUsername(request.getUsername()))
-            .filter(userEntityOptional -> userEntityOptional.isPresent() && passwordEncoder.matches(request.getPassword(), userEntityOptional.get().getPassword()))
-            .switchIfEmpty(Mono.error(new UnauthorizedException("Incorrect username or passoword.")))
-            .map(userEntityOptional -> {
-                UserEntity userEntity = userEntityOptional.get();
-                String userId = String.valueOf(userEntity.getId());
+    public ResponseEntity<Void> onLogin(LoginRequest request) throws UnauthorizedException {
+        Optional<UserEntity> userEntityOptional = usersRepository.findByUsername(request.getUsername());
 
-                Map<String, Object> claims = new HashMap<>();
-                claims.put("roles", userEntity.getRoles());
+        if(userEntityOptional.isEmpty() || !passwordEncoder.matches(request.getPassword(), userEntityOptional.get().getPassword())) {
+            throw new UnauthorizedException("Incorrect username or passoword.");
+        }
 
-                HttpHeaders httpHeaders = new HttpHeaders();
+        long userId = userEntityOptional.get().getId();
 
-                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.createCookie(JwtType.ACCESS_TOKEN, userId, claims).toString());
-                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.createCookie(JwtType.REFRESH_TOKEN, userId, claims).toString());
+        UserRoleMappingEntity userRoleMappingEntity = userRoleMappingsRepository.findByIdUserId(userId).orElseThrow(() -> new UnauthorizedException());
 
-                return httpHeaders;
-            })
-            .map(httpHeaders -> ResponseEntity.ok().headers(httpHeaders).build());
+        RoleEntity roleEntity = rolesRepository.findById(userRoleMappingEntity.getId().getRoleId()).orElseThrow(() -> new UnauthorizedException()); 
+
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("role", roleEntity.getName());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.createCookie(JwtType.ACCESS_TOKEN, String.valueOf(userId), claims).toString());
+        httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.createCookie(JwtType.REFRESH_TOKEN, String.valueOf(userId), claims).toString());
+
+        return ResponseEntity.ok().headers(httpHeaders).build();
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> onLogout(String userId) {
-        return Mono.fromCallable(() -> userRepository.findById(Long.parseLong(userId)))
-            .filter(userEntityOptional -> userEntityOptional.isPresent())
-            .switchIfEmpty(Mono.error(new UnauthorizedException()))
-            .map(userEntityOptional -> {
-                HttpHeaders httpHeaders = new HttpHeaders();
+    public ResponseEntity<Void> onLogout(String userId) throws UnauthorizedException {
+        usersRepository.findById(Long.parseLong(userId)).orElseThrow(() -> new UnauthorizedException());
+        
+        HttpHeaders httpHeaders = new HttpHeaders();
 
-                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.invalidateCookie(JwtType.ACCESS_TOKEN).toString());
-                httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.invalidateCookie(JwtType.REFRESH_TOKEN).toString());
+        httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.invalidateCookie(JwtType.ACCESS_TOKEN).toString());
+        httpHeaders.add(HttpHeaders.SET_COOKIE, jwtUtils.invalidateCookie(JwtType.REFRESH_TOKEN).toString());
 
-                return httpHeaders;
-            })
-            .map(httpHeaders -> ResponseEntity.ok().headers(httpHeaders).build());
-
+        return ResponseEntity.ok().headers(httpHeaders).build();
     }
 
     @Override
-    public Mono<GenericResponse> onSignUp(SignUpRequest request, Roles role) {
-        return Mono.just(request)
-            .filter(req -> req.getPassword().equals(req.getConfirmPassword()))
-            .switchIfEmpty(Mono.error(new BadRequestException("Passwords do not match")))
-            .map(req -> userMapper.toUserEntity(req, List.of(role.name()), passwordEncoder.encode(req.getPassword())))
-            .flatMap(user -> Mono.fromCallable(() -> userRepository.save(user)).subscribeOn(Schedulers.boundedElastic()))
-            .onErrorResume(DataIntegrityViolationException.class, e -> Mono.error(new BadRequestException("Username already exists")))
-            .map(userEntity -> GenericResponse.builder().message("User created successfully.").build());
+    public GenericResponse onSignUp(SignUpRequest request) throws BadRequestException{
+        if(!request.getPassword().equals(request.getConfirmPassword()) || "ADMIN".equalsIgnoreCase(request.getRole())) {
+            throw new BadRequestException("Passwords do not match");
+        }
+
+        Optional<RoleEntity> roleEntityOptional = rolesRepository.findByName(request.getRole());
+
+        if(roleEntityOptional.isEmpty()) {
+            throw new BadRequestException();
+        }
+
+        UserEntity userEntity = userMapper.toUserEntity(request, passwordEncoder.encode(request.getPassword()));
+
+        try {
+            usersRepository.save(userEntity);
+        } catch(DataIntegrityViolationException e) {
+            throw new BadRequestException("Username already exists");
+        }
+
+        UserRoleMappingEntity userRoleMappingEntity = UserRoleMappingEntity.builder().id(UserRoleMappingId.builder().userId(userEntity.getId()).roleId(roleEntityOptional.get().getId()).build()).build();
+
+        userRoleMappingsRepository.save(userRoleMappingEntity);
+
+        return GenericResponse.builder().message("User created successfully.").build();
     }
 }
