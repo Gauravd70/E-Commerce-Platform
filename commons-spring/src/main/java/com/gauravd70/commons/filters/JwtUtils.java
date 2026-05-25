@@ -1,10 +1,11 @@
 package com.gauravd70.commons.filters;
 
-import java.security.Key;
 import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
@@ -16,7 +17,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
@@ -25,17 +25,17 @@ import lombok.RequiredArgsConstructor;
 public class JwtUtils {
     private final JwtProperties jwtProperties;
 
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.getSecret()));
     }
     
     private String create(String userId, Map<String, Object> claims, long expiryInMs) {
         return Jwts.builder()
-            .setSubject(userId)
-            .addClaims(claims)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + expiryInMs))
-            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .subject(userId)
+            .claims(claims)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + expiryInMs))
+            .signWith(getSigningKey(), Jwts.SIG.HS256)
             .compact();
     }
 
@@ -101,10 +101,10 @@ public class JwtUtils {
      */
     public Claims getClaims(String jwt) throws JwtException, SignatureException, ExpiredJwtException, IllegalArgumentException {
         return Jwts
-            .parserBuilder()
-            .setSigningKey(getSigningKey())
+            .parser()
+            .verifyWith(getSigningKey())
             .build()
-            .parseClaimsJws(jwt)
-            .getBody();
+            .parseSignedClaims(jwt)
+            .getPayload();
     }
 }
