@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -52,15 +54,15 @@ public class AuthControllerTest {
     void givenLoginRequest_whenNotSignedUp_thenReturn401Unauthorized() throws Exception {
         LoginRequest request = LoginRequest.builder().username("abcd123").password("abcd123").build();
 
+        GenericResponse expectedResponse = GenericResponse.builder().message("Incorrect username or passoword.").build();
+
         mockMvc.perform(
             MockMvcRequestBuilders
                 .post("/v1/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-            .andReturn()
-            .getResponse()
-            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Incorrect username or passoword.").build()));
+            .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResponse)));
     }
 
     @Test
@@ -75,15 +77,15 @@ public class AuthControllerTest {
 
         LoginRequest loginRequest = LoginRequest.builder().username("test@gmail.com").password("Abcd@1234").build();
 
+        GenericResponse expectedResponse = GenericResponse.builder().message("Incorrect username or passoword.").build();
+
         mockMvc.perform(
             MockMvcRequestBuilders
                 .post("/v1/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(loginRequest)))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-            .andReturn()
-            .getResponse()
-            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Incorrect username or passoword.").build()));
+            .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResponse)));
     }
 
     @Test
@@ -120,30 +122,30 @@ public class AuthControllerTest {
                 .content(objectMapper.writeValueAsBytes(signUpRequest)))
             .andExpect(MockMvcResultMatchers.status().isOk());
 
+        GenericResponse expectedResponse = GenericResponse.builder().message("Username already exists").build();
+
         mockMvc.perform(
             MockMvcRequestBuilders
                 .post("/v1/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(signUpRequest)))
             .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andReturn()
-            .getResponse()
-            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Username already exists").build()));
+            .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResponse)));
     }
 
     @Test
     void givenSignUpRequest_whenPasswordMismatch_thenReturn400BadRequest() throws Exception {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@1234").role("ROLE_CUSTOMER").build();
 
+        GenericResponse expectedResponse = GenericResponse.builder().message("Passwords do not match").build();
+
         mockMvc.perform(
             MockMvcRequestBuilders
                 .post("/v1/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(signUpRequest)))
             .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andReturn()
-            .getResponse()
-            .getContentAsString().equals(objectMapper.writeValueAsString(GenericResponse.builder().message("Passwords do not match").build()));
+            .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResponse)));
     }
 
      @Test
