@@ -1,6 +1,9 @@
 package com.gauravd70.ecommerce.dtos.responses;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,10 +15,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetProductResponse {
-    private long id;
+    private String id;
     private String name;
     private double price;
     private String description;
-    private List<ImageInfo> images;
+    private long sellerId;
+    private String groupId;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private Map<String, String> attributes;
+    private List<ImageInfoResponse> images;
     private List<String> categories;
 }

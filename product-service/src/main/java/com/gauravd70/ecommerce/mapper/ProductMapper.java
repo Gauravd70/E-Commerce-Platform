@@ -1,44 +1,47 @@
 package com.gauravd70.ecommerce.mapper;
 
-import java.util.List;
-import java.util.Map;
-
-import org.mapstruct.InjectionStrategy;
+import org.bson.types.ObjectId;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gauravd70.ecommerce.dtos.entities.ProductEntity;
-import com.gauravd70.ecommerce.dtos.entities.ProductImageMappingEntity;
+import com.gauravd70.ecommerce.dtos.documents.ImageInfoDocument;
+import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
+import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
+import com.gauravd70.ecommerce.dtos.requests.PutProductRequest;
 import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
-import com.gauravd70.ecommerce.dtos.responses.ImageInfo;
+import com.gauravd70.ecommerce.dtos.responses.ImageInfoResponse;
 
-import lombok.RequiredArgsConstructor;
+@Mapper(componentModel = "spring")
+public interface ProductMapper {
+    public default ObjectId toObjectId(String id) throws IllegalArgumentException{
+        return new ObjectId(id);
+    }
 
-@RequiredArgsConstructor
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public abstract class ProductMapper {
-    private final ObjectMapper objectMapper;
-
-    public String mapToJsonString(Map<String, String> map) throws JsonProcessingException {
-        if(map == null) {
-            return "{}";
+    public default String objectIdToString(ObjectId id) {
+        if(id == null) {
+            return null;
         }
 
-        return objectMapper.writeValueAsString(map);
+        return id.toString();
     }
+
+    @Mapping(target = "id", ignore = true)
+    public ImageInfoDocument toImageInfoDocument(ImageInfoRequest request);
+
+    public ImageInfoResponse toImageInfoResponse(ImageInfoDocument document);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    public abstract ProductEntity toProductEntity(PostProductRequest request, long sellerId, long groupId);
+    public ProductDocument toProductDocument(PostProductRequest request, long sellerId, ObjectId groupId);
 
-    public abstract GetProductResponse toGetProductResponse(ProductEntity entity, List<ImageInfo> images, List<String> categories);
+    public GetProductResponse toGetProductResponse(ProductDocument document);
 
-    public abstract ImageInfo toImageInfo(ProductImageMappingEntity entity);
-
-    public abstract List<ImageInfo> toImageInfoList(Iterable<ProductImageMappingEntity> iterable);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PutProductRequest request, ObjectId groupId);
 }

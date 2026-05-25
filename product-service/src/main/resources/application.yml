@@ -1,19 +1,12 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /products
 spring:
-  webflux:
-    basePath: /products
-  datasource:
-    url: ${MYSQL_URL}
-    username: ${MYSQL_ROOT_USERNAME}
-    password: ${MYSQL_ROOT_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      auto-index-creation: true
 management:
   endpoints:
     health:
@@ -23,3 +16,8 @@ management:
     web:
       exposure:
         include: health
+jwt:
+  secret: ${JWT_SECRET}
+  expiry:
+    access: 3600000
+    refresh: 604800000

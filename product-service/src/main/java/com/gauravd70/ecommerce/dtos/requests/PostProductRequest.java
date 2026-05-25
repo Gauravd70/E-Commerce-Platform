@@ -1,10 +1,12 @@
 package com.gauravd70.ecommerce.dtos.requests;
 
+import java.util.List;
 import java.util.Map;
 
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,11 +19,14 @@ import lombok.NoArgsConstructor;
 public class PostProductRequest {
     @NotBlank
     private String name;
-    @Min(value = 0)
+    @PositiveOrZero
     private double price;
-    @Min(value = 0)
+    @PositiveOrZero
     private int quantity;
     @NotEmpty
     private String description;
+    private List<String> categories;
+    @Valid
+    private List<ImageInfoRequest> images;
     private Map<String, String> attributes;
 }

@@ -10,24 +10,33 @@ This service is responsible for managing the products.
 ### Dependencies
 - spring-boot-starter-web: Implementing MVC based REST APIs
 - spring-boot-starter-validation: Validating API request body
-- spring-boot-starter-data-jpa: Implementing data access layer 
-- mysql-connector-j: MySQL Connector implementation required by Data JPA
+- spring-boot-starter-data-mongodb: Implementing data access layer 
 - spring-boot-starter-actuator: Implementing service health APIs
 - spring-boot-starter-security: Implementing authentication and authorization 
 - spring-boot-starter-test: Writing integration tests for APIs
 - spring-boot-testcontainers: Managing test containers for integration tests.
 - spring-boot-webmvc-test: Creating clients for tests
 - junit-jupiter: Annotations for wiring Junit with Test containers
-- mysql: Implementation for MySQL test containers 
+- mongodb: Implementation for MySQL test containers 
 - lombok: Generating boiler plate code
 - commons-spring: [refer]()
 - mapstruct: Generating mappers from one model to another.
 - jacoco-maven-plugin: Creating code coverage reports
-- flyway-core
-- flyway-mysql
-- spring-boot-starter-flyway
-- jjwt-api
-- jjwt-impl
+
+### Create Product Flow
+1. Call POST [/v1](#post-productsv1)
+2. Validate request body
+    1. If invalid, return 400 BAD REQUEST
+    2. If valid, fo to step 3
+3. TODO: Call Catalog Service to get the canonical group for the product
+4. Create product document from the request
+5. Persist the document to products collection
+6. TODO: Send an event to inventory service
+7. Return 200 OK 
+
+### Update Product Flow
+
+### Delete Product Flow
 
 ## API Specs
 
@@ -38,7 +47,25 @@ Request Body:
     "name": "asdasd",
     "price": 20.0,
     "quantity": 5,
-    "description": "adsanda"
+    "description": "adsanda",
+    "images": [
+        {
+            "id": "ObjectId",
+            "url": "https://image.com",
+            "type": "thumbnail",
+            "displayOrder": 1
+        },
+        .
+        .
+        .
+        {
+            "id": "ObjectId",
+            "url": "https://image_n.com",
+            "type": "thumbnail",
+            "displayOrder": n
+        }
+    ],
+    "categories": [ObjectId1,.....,ObjectIdn]
 }
 
 Response Body:
@@ -75,10 +102,10 @@ Response Body:
         }
     ],
     "categories": [
-        cat1,
+        cat1Id,
         .
         .,
-        catn
+        catnId
     ]
 }
 ```
@@ -90,7 +117,25 @@ Request Body:
     "name": "asdasd",
     "price": 20.0,
     "quantity": 5,
-    "description": "adsanda"
+    "description": "adsanda",
+    "images": [
+        {
+            "id": "ObjectId",
+            "url": "https://image.com",
+            "type": "thumbnail",
+            "displayOrder": 1
+        },
+        .
+        .
+        .
+        {
+            "id": "ObjectId",
+            "url": "https://image_n.com",
+            "type": "thumbnail",
+            "displayOrder": n
+        }
+    ],
+    "categories": [ObjectId1,.....,ObjectIdn]
 }
 
 Response Body:
@@ -126,36 +171,7 @@ Response Body:
 }
 ```
 
-### POST /products/v1/{productId}/images
-```
-Request Body:
-[
-    {
-        "url": "url",
-        "type": "thumbnail|gallery",
-        "displayOrder": 1
-    },
-    .
-    .
-    .,
-    {
-        "url": "url",
-        "type": "gallery",
-        "displayOrder": n
-    }
-]
-
-Response Body:
-200 OK
-```
-
-### DELETE /products/v1/{productId}/images/{imageId}
-```
-Response Body:
-200 OK
-```
-
-### POST /categories/v1
+### POST /products/categories/v1
 ```
 Request Body:
 {
@@ -169,7 +185,7 @@ Response Body:
 }
 ```
 
-### GET /categories
+### GET /products/categories
 ```
 Response Body:
 200 OK {
@@ -188,7 +204,7 @@ Response Body:
 }
 ```
 
-### GET /categories/{categoryId}
+### GET /products/categories/{categoryId}
 ```
 Response Body:
 200 OK {
@@ -197,7 +213,7 @@ Response Body:
 }
 ```
 
-### PUT /categories/{categoryId}
+### PUT /products/categories/{categoryId}
 ```
 Request Body:
 {
@@ -210,53 +226,35 @@ Response Body:
 }
 ```
 
-### DELETE /categories/{categoryId}
+### DELETE /products/categories/{categoryId}
 ```
 Response Body:
 200 OK 
 ```
 
-### POST /products/v1/{productId}/categories
-```
-Request Body:
-[catId1,...., catIdn]
-
-Response Body:
-200 OK
-```
-
-### DELETE /products/v1/{productId}/categories/{categoryId}
-```
-Response Body:
-200 OK
-```
-
 ## Schema
 
-### product table
-- id long (Primary Key Auto Increment)
-- name varchar
-- price decimal(10, 2)
-- description text
-- seller_id long
-- group_id long
+### products collection document
+- id ObjectId
+- name String
+- price double
+- description String
+- sellerId long
+- group_id ObjectId
 - active boolean
-- created_at timestamp
-- updated_at timestamp
+- createdAt ISODate
+- updatedAt ISODate
+- categories List\<ObjectId> 
+- images List<[ImageInfo](#imageinfo-document)>
+- attributes JsonObject
 
-### category table
-- id long (Primary Key Auto Increment)
-- name varchar (Unique)
+### ImageInfo Document
+- id ObjectId
+- url String
+- type String (thumbnail|gallery)
+- displayOrder int
 
-### product_category_mapping table
-- product_id long (Foreign Key)
-- category_id long (Foreign Key)
-
-PRIMARY KEY (productId + categoryId)
-
-### product_image_mapping table
-- id long (Primary Key Auto Increment)
-- product_id long (Foreign Key)
-- url varchar
-- type varchar
-- display_order int
+### categories collection document
+- id ObjectId
+- name String unique
+- active boolean

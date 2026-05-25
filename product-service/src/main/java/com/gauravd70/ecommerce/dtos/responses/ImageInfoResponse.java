@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageInfo {
-    private long id;
+public class ImageInfoResponse {
+    private String id;
     private String url;
     private String type;
     private int displayOrder;

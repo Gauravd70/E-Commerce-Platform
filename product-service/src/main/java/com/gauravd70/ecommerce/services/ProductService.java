@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.services;
 
+import org.springframework.http.ResponseEntity;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.commons.exceptions.BadRequestException;
@@ -38,4 +40,13 @@ public interface ProductService {
      * @throws JsonProcessingException
      */
     public GenericResponse updateProduct(String productId, PutProductRequest request) throws BadRequestException, JsonProcessingException;
+
+    /**
+     * Delete a product
+     * 
+     * @param productId {@link String}
+     * @return {@link ResponseEntity}<{@link Void}>
+     * @throws BadRequestException
+     */
+    public GenericResponse onDeleteProduct(String productId) throws BadRequestException;
 }

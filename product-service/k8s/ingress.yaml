@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: product-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: myecommerce.test
+      http:
+        paths:
+          - path: /products
+            pathType: Prefix
+            backend:
+              service:
+                name: product
+                port:
+                  number: 80

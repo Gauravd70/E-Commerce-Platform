@@ -1,23 +1,12 @@
 package com.gauravd70.ecommerce.repositories;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.gauravd70.ecommerce.dtos.entities.CategoryEntity;
+import com.gauravd70.ecommerce.dtos.documents.CategoryDocument;
 
 @Repository
-public interface CategoriesRepository extends CrudRepository<CategoryEntity, Long> {
+public interface CategoriesRepository extends MongoRepository<CategoryDocument, ObjectId>{
 
-    @Query(value = """
-        SELECT c.name
-        FROM categories c
-        JOIN product_category_mappings pcm
-            ON c.id = pcm.category_id
-        WHERE pcm.product_id = :productId
-        """, nativeQuery = true)
-    List<String> findAllCategoriesByProductId(@Param("productId") long productId);
 }
