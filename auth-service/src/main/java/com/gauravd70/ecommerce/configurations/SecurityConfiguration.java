@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.gauravd70.ecommerce.filters.JwtFilter;
+import com.gauravd70.commons.filters.JwtFilter;
 
 @Configuration
 public class SecurityConfiguration {

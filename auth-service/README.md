@@ -24,9 +24,6 @@ This service is responsible for authenticating and authorizing the users.
 - commons-spring: [refer]()
 - mapstruct: Generating mappers from one model to another.
 - jacoco-maven-plugin: Creating code coverage reports
-- jjwt-api
-- jjwt-impl
-- jjwt-jackson
 - flyway-core
 - flyway-mysql
 - spring-boot-starter-flyway
