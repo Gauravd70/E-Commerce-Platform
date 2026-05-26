@@ -4,7 +4,7 @@ metadata:
   name: product-Deployment
 spec:
   replicas: 1
-  selectors:
+  selector:
     matchLabels:
       app: product
       tier: backend
