@@ -1,0 +1,20 @@
+name: MongoDB CD
+run-name: Deploys MongoDB as an infra service
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/mongo/**'
+jobs:
+  cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: k8s apply
+        uses: Gauravd70/CI-Actions/k8s-deploy@v11
+        with:
+          ns: infra
+          k: 'infra/mongo'

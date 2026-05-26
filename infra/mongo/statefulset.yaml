@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-statefulset
+spec:
+  serviceName: mongo
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+      tier: infra
+  template:
+    metadata:
+      labels:
+        app: mongo
+        tier: infra
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:8.3.2
+          ports:
+            - containerPort: 27017
+          envFrom:
+            - secretRef:
+                name: mongo-secret
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - >
+                  mongosh --quiet --eval "db.adminCommand('ping').ok"
+                  | grep 1
+            initialDelaySeconds: 40
+            periodSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - >
+                  mongosh --quiet --eval "db.adminCommand('ping').ok"
+                  | grep 1
+            initialDelaySeconds: 40
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi 
+    
