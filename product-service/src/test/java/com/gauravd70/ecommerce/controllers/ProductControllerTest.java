@@ -32,6 +32,7 @@ import com.gauravd70.commons.filters.JwtType;
 import com.gauravd70.commons.filters.JwtUtils;
 import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
+import com.gauravd70.ecommerce.dtos.requests.PutProductRequest;
 import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
 import com.gauravd70.ecommerce.dtos.responses.ImageInfoResponse;
 import com.gauravd70.ecommerce.repositories.ProductsRepository;
@@ -232,5 +233,226 @@ public class ProductControllerTest {
             Assertions.assertThat(actualResponse.getImages())
                     .extracting(ImageInfoResponse::getId)
                     .doesNotContainNull();   
+    }
+
+    @Test
+    void givenPutProductRequest_whenInvalid_thenReturn400BadRequest() throws Exception{
+        Cookie accessTokenCookie = getAccessToken("ROLE_SELLER");
+
+        Map<String, String> attributes = new HashMap<>();
+
+        attributes.put("RAM", "8GB");
+        attributes.put("OS", "MacOS");
+        attributes.put("Color", "Grey");
+        attributes.put("Storage", "512GB");
+
+        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+
+        PostProductRequest request = PostProductRequest
+            .builder()
+            .name("Apple MacBook Pro")
+            .price(150000)
+            .quantity(10)
+            .description("M5 16 inch apple laptop")
+            .images(List.of(
+                ImageInfoRequest
+                    .builder()
+                    .url("https://www.image.com")
+                    .type("thumbnail")
+                    .displayOrder(0)
+                    .build(),
+                ImageInfoRequest
+                    .builder()
+                    .url("https://www.image2.com")
+                    .type("gallery")
+                    .displayOrder(1)
+                    .build()))
+            .categories(categories)
+            .attributes(attributes)
+            .build();
+
+            String response = mockMvc.perform(
+                MockMvcRequestBuilders
+                    .post("/v1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+                    .cookie(accessTokenCookie)
+            ).andExpect(MockMvcResultMatchers.status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+            GenericResponse genericResponse = objectMapper.readValue(response, GenericResponse.class);
+
+            PutProductRequest putProductRequest = PutProductRequest.builder().price(-1d).build(); 
+
+            mockMvc.perform(
+                MockMvcRequestBuilders
+                    .put("/v1/"+genericResponse.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(accessTokenCookie)
+                    .content(objectMapper.writeValueAsString(putProductRequest)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void givenPutProductRequest_whenValid_thenReturn200Ok() throws Exception{
+        Cookie accessTokenCookie = getAccessToken("ROLE_SELLER");
+
+        Claims claims = jwtUtils.getClaims(accessTokenCookie.getValue());
+
+        Map<String, String> attributes = new HashMap<>();
+
+        attributes.put("RAM", "8GB");
+        attributes.put("OS", "MacOS");
+        attributes.put("Color", "Grey");
+        attributes.put("Storage", "512GB");
+
+        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+
+        PostProductRequest postProductRequest = PostProductRequest
+            .builder()
+            .name("Apple MacBook Pro")
+            .price(150000)
+            .quantity(10)
+            .description("M5 16 inch apple laptop")
+            .images(List.of(
+                ImageInfoRequest
+                    .builder()
+                    .url("https://www.image.com")
+                    .type("thumbnail")
+                    .displayOrder(0)
+                    .build(),
+                ImageInfoRequest
+                    .builder()
+                    .url("https://www.image2.com")
+                    .type("gallery")
+                    .displayOrder(1)
+                    .build()))
+            .categories(categories)
+            .attributes(attributes)
+            .build();
+
+            String postProductResponseString = mockMvc.perform(
+                MockMvcRequestBuilders
+                    .post("/v1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(postProductRequest))
+                    .cookie(accessTokenCookie)
+            ).andExpect(MockMvcResultMatchers.status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+            GenericResponse genericResponse = objectMapper.readValue(postProductResponseString, GenericResponse.class);
+
+            PutProductRequest putProductRequest = 
+                PutProductRequest.builder().price(100000d).description("M5 16 inch").build(); 
+
+            GenericResponse expectedPutProductResponse = GenericResponse.builder().message("Product updated successfully").build();
+
+            mockMvc.perform(
+                MockMvcRequestBuilders
+                    .put("/v1/"+genericResponse.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(accessTokenCookie)
+                    .content(objectMapper.writeValueAsString(putProductRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedPutProductResponse)));
+
+            GetProductResponse expectedGetProductResponse = GetProductResponse.builder()
+                .id(genericResponse.getId())
+                .name("Apple MacBook Pro")
+                .price(100000)
+                .description("M5 16 inch")
+                .sellerId(Long.valueOf(claims.getSubject()))
+                .images(List.of(
+                    ImageInfoResponse
+                        .builder()
+                        .url("https://www.image.com")
+                        .type("thumbnail")
+                        .displayOrder(0)
+                        .build(),
+                    ImageInfoResponse
+                        .builder()
+                        .url("https://www.image2.com")
+                        .type("gallery")
+                        .displayOrder(1)
+                        .build()))
+                .categories(categories)
+                .attributes(attributes)
+                .build();
+
+            String actualGetProductResponseString = mockMvc.perform(MockMvcRequestBuilders.get("/v1/"+genericResponse.getId()).cookie(accessTokenCookie))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            GetProductResponse actualResponse = objectMapper.readValue(actualGetProductResponseString, GetProductResponse.class);
+
+            Assertions.assertThat(actualResponse)
+                    .usingRecursiveComparison()
+                    .ignoringFields("images.id", "sellerId", "groupId", "createdAt", "updatedAt")
+                    .isEqualTo(expectedGetProductResponse);
+            
+            Assertions.assertThat(actualResponse.getSellerId()).isNotNull();
+            Assertions.assertThat(actualResponse.getGroupId()).isNotNull();
+            Assertions.assertThat(actualResponse.getCreatedAt()).isNotNull();
+            Assertions.assertThat(actualResponse.getUpdatedAt()).isNotNull();
+
+            Assertions.assertThat(actualResponse.getImages())
+                    .extracting(ImageInfoResponse::getId)
+                    .doesNotContainNull();
+    }
+
+    @Test
+    void givenDeleteProductRequest_whenValid_thenReturn200O() throws Exception {
+        Cookie accessTokenCookie = getAccessToken("ROLE_SELLER");
+
+        Map<String, String> attributes = new HashMap<>();
+
+        attributes.put("RAM", "8GB");
+        attributes.put("OS", "MacOS");
+        attributes.put("Color", "Grey");
+        attributes.put("Storage", "512GB");
+
+        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+
+        PostProductRequest postProductRequest = PostProductRequest
+            .builder()
+            .name("Apple MacBook Pro")
+            .price(150000)
+            .quantity(10)
+            .description("M5 16 inch apple laptop")
+            .images(List.of(
+                ImageInfoRequest
+                    .builder()
+                    .url("https://www.image.com")
+                    .type("thumbnail")
+                    .displayOrder(0)
+                    .build(),
+                ImageInfoRequest
+                    .builder()
+                    .url("https://www.image2.com")
+                    .type("gallery")
+                    .displayOrder(1)
+                    .build()))
+            .categories(categories)
+            .attributes(attributes)
+            .build();
+
+            String postProductResponseString = mockMvc.perform(
+                MockMvcRequestBuilders
+                    .post("/v1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(postProductRequest))
+                    .cookie(accessTokenCookie)
+            ).andExpect(MockMvcResultMatchers.status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+            GenericResponse genericResponse = objectMapper.readValue(postProductResponseString, GenericResponse.class);
+
+            mockMvc.perform(MockMvcRequestBuilders.delete("/v1/"+genericResponse.getId()).cookie(accessTokenCookie))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+            mockMvc.perform(MockMvcRequestBuilders.get("/v1/"+genericResponse.getId()).cookie(accessTokenCookie))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
