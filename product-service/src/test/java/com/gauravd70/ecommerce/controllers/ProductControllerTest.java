@@ -32,7 +32,7 @@ import com.gauravd70.commons.filters.JwtType;
 import com.gauravd70.commons.filters.JwtUtils;
 import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
-import com.gauravd70.ecommerce.dtos.requests.PutProductRequest;
+import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
 import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
 import com.gauravd70.ecommerce.dtos.responses.ImageInfoResponse;
 import com.gauravd70.ecommerce.repositories.ProductsRepository;
@@ -236,7 +236,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    void givenPutProductRequest_whenInvalid_thenReturn400BadRequest() throws Exception{
+    void givenPatchProductRequest_whenInvalid_thenReturn400BadRequest() throws Exception{
         Cookie accessTokenCookie = getAccessToken("ROLE_SELLER");
 
         Map<String, String> attributes = new HashMap<>();
@@ -282,19 +282,19 @@ public class ProductControllerTest {
 
             GenericResponse genericResponse = objectMapper.readValue(response, GenericResponse.class);
 
-            PutProductRequest putProductRequest = PutProductRequest.builder().price(-1d).build(); 
+            PatchProductRequest patchProductRequest = PatchProductRequest.builder().price(-1d).build(); 
 
             mockMvc.perform(
                 MockMvcRequestBuilders
-                    .put("/v1/"+genericResponse.getId())
+                    .patch("/v1/"+genericResponse.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .cookie(accessTokenCookie)
-                    .content(objectMapper.writeValueAsString(putProductRequest)))
+                    .content(objectMapper.writeValueAsString(patchProductRequest)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
-    void givenPutProductRequest_whenValid_thenReturn200Ok() throws Exception{
+    void givenPatchProductRequest_whenValid_thenReturn200Ok() throws Exception{
         Cookie accessTokenCookie = getAccessToken("ROLE_SELLER");
 
         Claims claims = jwtUtils.getClaims(accessTokenCookie.getValue());
@@ -342,17 +342,17 @@ public class ProductControllerTest {
 
             GenericResponse genericResponse = objectMapper.readValue(postProductResponseString, GenericResponse.class);
 
-            PutProductRequest putProductRequest = 
-                PutProductRequest.builder().price(100000d).description("M5 16 inch").build(); 
+            PatchProductRequest patchProductRequest = 
+                PatchProductRequest.builder().price(100000d).description("M5 16 inch").build(); 
 
             GenericResponse expectedPutProductResponse = GenericResponse.builder().message("Product updated successfully").build();
 
             mockMvc.perform(
                 MockMvcRequestBuilders
-                    .put("/v1/"+genericResponse.getId())
+                    .patch("/v1/"+genericResponse.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .cookie(accessTokenCookie)
-                    .content(objectMapper.writeValueAsString(putProductRequest)))
+                    .content(objectMapper.writeValueAsString(patchProductRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedPutProductResponse)));
 

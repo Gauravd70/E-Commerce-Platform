@@ -1,15 +1,18 @@
 package com.gauravd70.ecommerce.services;
 
 import org.bson.types.ObjectId;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.commons.exceptions.BadRequestException;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
+import com.gauravd70.ecommerce.dtos.requests.PatchProductStatusRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
-import com.gauravd70.ecommerce.dtos.requests.PutProductRequest;
+import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
 import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
+import com.gauravd70.ecommerce.dtos.responses.GetProductStatusResponse;
 import com.gauravd70.ecommerce.mapper.ProductMapper;
 import com.gauravd70.ecommerce.repositories.ProductsRepository;
 
@@ -55,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public GenericResponse updateProduct(String productId, PutProductRequest request) throws BadRequestException, JsonProcessingException {
+    public GenericResponse updateProduct(String productId, PatchProductRequest request) throws BadRequestException, JsonProcessingException {
         ObjectId id;
         
         try {
@@ -94,5 +97,35 @@ public class ProductServiceImpl implements ProductService {
         // TODO send event to Inventory service to remove the inventory for the given product
 
         return GenericResponse.builder().message("Product deleted successfully").build();
+    }
+
+    @Override
+    public ResponseEntity<Void> onPatchProductStatus(String productId, PatchProductStatusRequest request) throws BadRequestException {
+        ObjectId id;
+        
+        try {
+            id = productMapper.toObjectId(productId);
+        } catch(Exception e) {
+            throw new BadRequestException();
+        }
+
+        productsRepository.updateProductStatus(id, request.isActive());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public GetProductStatusResponse getProductStatus(String productId) throws BadRequestException {
+        ObjectId id;
+        
+        try {
+            id = productMapper.toObjectId(productId);
+        } catch(Exception e) {
+            throw new BadRequestException();
+        }
+
+        ProductDocument productDocument = productsRepository.findById(id).orElseThrow(() -> new BadRequestException());
+
+        return GetProductStatusResponse.builder().active(productDocument.isActive()).build();
     }
 }
