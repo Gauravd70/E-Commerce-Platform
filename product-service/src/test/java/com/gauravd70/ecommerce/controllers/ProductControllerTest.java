@@ -231,7 +231,6 @@ public class ProductControllerTest {
 
             Assertions.assertThat(actualResponse.getImages())
                     .extracting(ImageInfoResponse::getId)
-                    .doesNotContainNull();
-            
+                    .doesNotContainNull();   
     }
 }

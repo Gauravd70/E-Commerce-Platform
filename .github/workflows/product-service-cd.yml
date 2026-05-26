@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: k8s deploy
-        uses: Gauravd70/CI-Actions/k8s-deploy@v11
+        uses: Gauravd70/CI-Actions/k8s-apply@v11
         with:
           ns: ${{ env.NAMESPACE }}
           k: product-service/k8s
