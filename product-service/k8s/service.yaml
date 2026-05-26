@@ -8,6 +8,6 @@ spec:
     app: product
     tier: backend
   ports:
-    - protocal: TCP
+    - protocol: TCP
       port: 80
       targetPort: 8080
