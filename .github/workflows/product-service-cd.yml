@@ -7,7 +7,7 @@ on:
       - completed
 concurrency:
   group: product-service-cd
-  cancel-in-progerss: true
+  cancel-in-progress: true
 env:
   NAMESPACE: 'ecommerce'
   DEPLOYMENT: 'product-deployment'

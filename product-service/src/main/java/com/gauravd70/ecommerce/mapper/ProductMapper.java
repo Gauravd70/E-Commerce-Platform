@@ -42,6 +42,11 @@ public interface ProductMapper {
 
     public GetProductResponse toGetProductResponse(ProductDocument document);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "sellerId", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PutProductRequest request, ObjectId groupId);
 }
