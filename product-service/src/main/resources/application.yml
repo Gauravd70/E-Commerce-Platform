@@ -3,9 +3,10 @@ server:
   servlet:
     context-path: /products
 spring:
+  mongodb:
+    uri: ${MONGODB_URI}
   data:
     mongodb:
-      uri: ${MONGODB_URI}
       auto-index-creation: true
 management:
   endpoints:
