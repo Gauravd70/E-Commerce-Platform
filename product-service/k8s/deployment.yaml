@@ -8,34 +8,34 @@ spec:
     matchLabels:
       app: product
       tier: backend
-    template:
-      metadata:
-        labels:
-          app: product
-          tier: backend
-      spec:
-        containers:
-          - name: product
-            image: gauravd70/ecommerce-product:latest
-            ports:
-              - containerPort: 8080
-            envFrom:
-              - secretRef:
-                  name: product-secret
-            livenessProbe:
-              httpGet:
-                path: /products/actuator/health/liveness
-                port: 8080
-              initialDelaySeconds: 30
-              periodSeconds: 10
-              timeoutSeconds: 5
-              failureThreshold: 3
-            readinessProbe:
-              httpGet:
-                path: /products/actuator/health/readiness
-                port: 8080
-              initialDelaySeconds: 20
-              periodSeconds: 5
-              timeoutSeconds: 3
-              failureThreshold: 3
+  template:
+    metadata:
+      labels:
+        app: product
+        tier: backend
+    spec:
+      containers:
+        - name: product
+          image: gauravd70/ecommerce-product:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: product-secret
+          livenessProbe:
+            httpGet:
+              path: /products/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /products/actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
             
