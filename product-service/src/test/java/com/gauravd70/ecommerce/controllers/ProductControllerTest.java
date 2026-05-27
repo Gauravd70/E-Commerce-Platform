@@ -17,9 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.MongoDBContainer;
@@ -28,8 +26,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import com.gauravd70.commons.dtos.GenericResponse;
-import com.gauravd70.commons.filters.JwtType;
-import com.gauravd70.commons.filters.JwtUtils;
 import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
@@ -40,38 +36,18 @@ import com.gauravd70.ecommerce.repositories.ProductsRepository;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
-import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Testcontainers
-public class ProductControllerTest {
+public class ProductControllerTest extends BaseControllerTest {
     @Container
     @ServiceConnection
     static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:8.3.2"));
 
     @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    JwtUtils jwtUtils;
-
-    @Autowired
     ProductsRepository productsRepository;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    Cookie getAccessToken(String role) {
-        Map<String, Object> claims = new HashMap<>();
-
-        claims.put("role", role);
-
-        ResponseCookie cookie = jwtUtils.createCookie(JwtType.ACCESS_TOKEN, "1234", claims);
-
-        return new Cookie(JwtType.ACCESS_TOKEN.name(), cookie.getValue());
-    }
 
     void givenPostProductRequest_whenNotAuthorized_thenReturn401Unauthorized() throws Exception {
         mockMvc.perform(

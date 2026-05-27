@@ -2,6 +2,7 @@ package com.gauravd70.ecommerce.controllers;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +25,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/categories/v1")
 @RequiredArgsConstructor
-public class CategoriesController {
+public class CategoryController {
     private final CategoriesService categoriesService;
 
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<GenericResponse> onPostCategory(@Valid @RequestBody PostCategoryRequest request) {
+    public ResponseEntity<GenericResponse> onPostCategory(@Valid @RequestBody PostCategoryRequest request) throws BadRequestException {
         return categoriesService.createCategory(request);
     }
 
@@ -47,7 +48,7 @@ public class CategoriesController {
         return categoriesService.patchCategory(categoryId, request);
     }
 
-    @GetMapping(value = "/{categoryId}")
+    @DeleteMapping(value = "/{categoryId}")
     public ResponseEntity<Void> onDeleteCategory(@PathVariable("categoryId") String categoryId) throws BadRequestException {
         return categoriesService.deleteCategory(categoryId);
     }

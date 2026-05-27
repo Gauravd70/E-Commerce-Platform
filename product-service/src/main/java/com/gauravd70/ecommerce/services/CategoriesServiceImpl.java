@@ -1,6 +1,7 @@
 package com.gauravd70.ecommerce.services;
 
 import org.bson.types.ObjectId;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,14 @@ public class CategoriesServiceImpl implements CategoriesService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public ResponseEntity<GenericResponse> createCategory(PostCategoryRequest request) {
+    public ResponseEntity<GenericResponse> createCategory(PostCategoryRequest request) throws BadRequestException {
         CategoryDocument categoryDocument = categoryMapper.toCategoryDocument(request);
 
-        categoryDocument = categoriesRepository.save(categoryDocument);
+        try {
+            categoryDocument = categoriesRepository.save(categoryDocument);
+        } catch(DataIntegrityViolationException e) {
+            throw new BadRequestException();
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED.value()).body(GenericResponse.builder().id(categoryDocument.getId().toString()).message("Category created successfully").build());
     }
@@ -68,7 +73,11 @@ public class CategoriesServiceImpl implements CategoriesService {
 
         CategoryDocument updatedDocument = categoryMapper.toCategoryDocument(document, request);
 
-        categoriesRepository.save(updatedDocument);
+        try {
+            categoriesRepository.save(updatedDocument);
+        } catch(DataIntegrityViolationException e) {
+            throw new BadRequestException();
+        }
 
         return GenericResponse.builder().message("Category updated successfully").build();
     }

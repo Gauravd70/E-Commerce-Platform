@@ -15,8 +15,9 @@ public interface CategoriesService {
      * 
      * @param request {@link PostCategoryRequest}
      * @return {@link ResponseEntity}<{@link GenericResponse}>
+     * @throws BadRequestException
      */
-    public ResponseEntity<GenericResponse> createCategory(PostCategoryRequest request);
+    public ResponseEntity<GenericResponse> createCategory(PostCategoryRequest request) throws BadRequestException;
 
     /**
      * Get a list of all the categories
