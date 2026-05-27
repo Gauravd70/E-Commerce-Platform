@@ -133,6 +133,21 @@ public class AuthControllerTest {
             .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResponse)));
     }
 
+    @ParameterizedTest
+    @MethodSource("com.gauravd70.ecommerce.dataproviders.AuthControllerDataProvider#getInvalidRoles")
+    void givenSignUpRequest_whenInvalidRole_thenReturn400BadRequest(String role) throws Exception {
+        String username = String.format("test%d@gmail.com", System.currentTimeMillis());
+
+        SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username(username).password("Abcd@123").confirmPassword("Abcd@123").role(role).build();
+
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/v1/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(signUpRequest)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
     @Test
     void givenSignUpRequest_whenPasswordMismatch_thenReturn400BadRequest() throws Exception {
         SignUpRequest signUpRequest = SignUpRequest.builder().firstname("test").lastname("user").username("test4@gmail.com").password("Abcd@123").confirmPassword("Abcd@1234").role("ROLE_CUSTOMER").build();
@@ -153,7 +168,6 @@ public class AuthControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/logout"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
-
 
     @Test
     void givenLogoutRequest_whenSuccess_thenReturn200OK() throws Exception {

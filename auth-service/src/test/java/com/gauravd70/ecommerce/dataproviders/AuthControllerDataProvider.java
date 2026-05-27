@@ -11,4 +11,8 @@ public class AuthControllerDataProvider {
             LoginRequest.builder().username("abc123").password(null).build(),
             LoginRequest.builder().username(null).password(null).build());
     }
+
+    public static Stream<String> getInvalidRoles() {
+        return Stream.of("ROLE_ADMIN", "USER");
+    }
 }

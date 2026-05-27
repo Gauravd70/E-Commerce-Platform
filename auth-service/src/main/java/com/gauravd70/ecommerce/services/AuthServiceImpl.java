@@ -78,7 +78,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public GenericResponse onSignUp(SignUpRequest request) throws BadRequestException{
-        if(!request.getPassword().equals(request.getConfirmPassword()) || "ADMIN".equalsIgnoreCase(request.getRole())) {
+        if("ROLE_ADMIN".equalsIgnoreCase(request.getRole())) {
+            throw new BadRequestException();
+        }
+
+        if(!request.getPassword().equals(request.getConfirmPassword())) {
             throw new BadRequestException("Passwords do not match");
         }
 
