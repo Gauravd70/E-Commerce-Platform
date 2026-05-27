@@ -16,18 +16,8 @@ import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
 import com.gauravd70.ecommerce.dtos.responses.ImageInfoResponse;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper {
-    public default ObjectId toObjectId(String id) throws IllegalArgumentException{
-        return new ObjectId(id);
-    }
+public interface ProductMapper extends BaseMapper{
 
-    public default String objectIdToString(ObjectId id) {
-        if(id == null) {
-            return null;
-        }
-
-        return id.toString();
-    }
 
     @Mapping(target = "id", ignore = true)
     public ImageInfoDocument toImageInfoDocument(ImageInfoRequest request);

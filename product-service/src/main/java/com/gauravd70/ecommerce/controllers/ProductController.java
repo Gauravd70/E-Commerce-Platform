@@ -33,7 +33,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public GenericResponse onPostProduct(@Valid @RequestBody PostProductRequest request, @RequestAttribute("ACCESS_TOKEN") Claims claims) {
+    public ResponseEntity<GenericResponse> onPostProduct(@Valid @RequestBody PostProductRequest request, @RequestAttribute("ACCESS_TOKEN") Claims claims) {
         return productService.createProduct(request, claims);
     }
 

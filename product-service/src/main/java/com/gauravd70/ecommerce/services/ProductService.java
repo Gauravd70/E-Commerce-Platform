@@ -19,9 +19,9 @@ public interface ProductService {
      * 
      * @param request {@link PostProductRequest}
      * @param claims {@link Claims}
-     * @return {@link GenericResponse}
+     * @return {@link ResponseEntity}<{@link GenericResponse}>
      */
-    public GenericResponse createProduct(PostProductRequest request, Claims claims);
+    public ResponseEntity<GenericResponse> createProduct(PostProductRequest request, Claims claims);
 
     /**
      * Get the information of the product for the given product Id 

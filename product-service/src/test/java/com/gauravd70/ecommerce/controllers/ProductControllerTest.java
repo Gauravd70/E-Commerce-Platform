@@ -125,7 +125,7 @@ public class ProductControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
                     .cookie(getAccessToken("ROLE_SELLER"))
-            ).andExpect(MockMvcResultMatchers.status().isOk())
+            ).andExpect(MockMvcResultMatchers.status().isCreated())
             .andReturn().getResponse().getContentAsString();
 
             GenericResponse genericResponse = objectMapper.readValue(response, GenericResponse.class);
@@ -185,7 +185,7 @@ public class ProductControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
                     .cookie(accessTokenCookie)
-            ).andExpect(MockMvcResultMatchers.status().isOk())
+            ).andExpect(MockMvcResultMatchers.status().isCreated())
             .andReturn().getResponse().getContentAsString();
 
             GenericResponse genericResponse = objectMapper.readValue(response, GenericResponse.class);
@@ -278,7 +278,7 @@ public class ProductControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
                     .cookie(accessTokenCookie)
-            ).andExpect(MockMvcResultMatchers.status().isOk())
+            ).andExpect(MockMvcResultMatchers.status().isCreated())
             .andReturn().getResponse().getContentAsString();
 
             GenericResponse genericResponse = objectMapper.readValue(response, GenericResponse.class);
@@ -338,7 +338,7 @@ public class ProductControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(postProductRequest))
                     .cookie(accessTokenCookie)
-            ).andExpect(MockMvcResultMatchers.status().isOk())
+            ).andExpect(MockMvcResultMatchers.status().isCreated())
             .andReturn().getResponse().getContentAsString();
 
             GenericResponse genericResponse = objectMapper.readValue(postProductResponseString, GenericResponse.class);
@@ -445,7 +445,7 @@ public class ProductControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(postProductRequest))
                     .cookie(accessTokenCookie)
-            ).andExpect(MockMvcResultMatchers.status().isOk())
+            ).andExpect(MockMvcResultMatchers.status().isCreated())
             .andReturn().getResponse().getContentAsString();
 
             GenericResponse genericResponse = objectMapper.readValue(postProductResponseString, GenericResponse.class);
@@ -499,7 +499,7 @@ public class ProductControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(postProductRequest))
                     .cookie(accessTokenCookie)
-            ).andExpect(MockMvcResultMatchers.status().isOk())
+            ).andExpect(MockMvcResultMatchers.status().isCreated())
             .andReturn().getResponse().getContentAsString();
 
             GenericResponse genericResponse = objectMapper.readValue(postProductResponseString, GenericResponse.class);

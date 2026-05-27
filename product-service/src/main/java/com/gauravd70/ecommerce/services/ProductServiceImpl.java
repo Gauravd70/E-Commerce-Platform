@@ -1,6 +1,7 @@
 package com.gauravd70.ecommerce.services;
 
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    public GenericResponse createProduct(PostProductRequest request, Claims claims) {
+    public ResponseEntity<GenericResponse> createProduct(PostProductRequest request, Claims claims) {
         // TODO call Catalog Service to get the canonical group
 
         ObjectId groupId = new ObjectId(); 
@@ -37,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
 
         // TODO send event to inventory service
 
-        return GenericResponse.builder().id(productDocument.getId().toString()).message("Product added successfully").build();
+        return ResponseEntity.status(HttpStatus.CREATED.value()).body(GenericResponse.builder().id(productDocument.getId().toString()).message("Product added successfully").build());
     }
 
     @Override
