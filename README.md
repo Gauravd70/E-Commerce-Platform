@@ -68,7 +68,7 @@
 - [Product Service](product-service/README.md)
 - [Search Service](#search-service)
 - [Recommendation Service](#recommendation-service)
-- [Catalog Service](#catalog-service)
+- [Catalog Service](#catalog-service/README.md)
 - [Inventory Service](#inventory-service)
 - [Checkout Service](#checkout-service)
 - [Payment Gateway](#payment-gateway)
@@ -118,9 +118,6 @@ Response Body:
 
 ## Recommendation Service
 This service is responsible for providing product suggestions based on the users past activities.
-
-## Catalog Service
-This service is responsible for normalization of the product and group them to provide the user with the different prices offered by different sellers for the same product
 
 ## Inventory Service
 Manages the products inventory
