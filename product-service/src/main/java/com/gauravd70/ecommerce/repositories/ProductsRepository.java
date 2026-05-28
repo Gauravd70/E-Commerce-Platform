@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
 
 @Repository
-public interface ProductsRepository extends MongoRepository<ProductDocument, ObjectId>{
-
+public interface ProductsRepository extends MongoRepository<ProductDocument, ObjectId>, ProductMongoTemplate {
 }

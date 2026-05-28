@@ -110,7 +110,7 @@ Response Body:
 }
 ```
 
-### PUT /products/v1/{productId}
+### PATCH /products/v1/{productId}
 ```
 Request Body:
 {
@@ -213,7 +213,7 @@ Response Body:
 }
 ```
 
-### PUT /products/categories/{categoryId}
+### PATCH /products/categories/{categoryId}
 ```
 Request Body:
 {

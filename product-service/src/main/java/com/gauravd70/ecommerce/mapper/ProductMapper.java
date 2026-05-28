@@ -11,23 +11,13 @@ import com.gauravd70.ecommerce.dtos.documents.ImageInfoDocument;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
 import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
-import com.gauravd70.ecommerce.dtos.requests.PutProductRequest;
+import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
 import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
 import com.gauravd70.ecommerce.dtos.responses.ImageInfoResponse;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper {
-    public default ObjectId toObjectId(String id) throws IllegalArgumentException{
-        return new ObjectId(id);
-    }
+public interface ProductMapper extends BaseMapper{
 
-    public default String objectIdToString(ObjectId id) {
-        if(id == null) {
-            return null;
-        }
-
-        return id.toString();
-    }
 
     @Mapping(target = "id", ignore = true)
     public ImageInfoDocument toImageInfoDocument(ImageInfoRequest request);
@@ -48,5 +38,5 @@ public interface ProductMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "sellerId", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PutProductRequest request, ObjectId groupId);
+    public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PatchProductRequest request, ObjectId groupId);
 }

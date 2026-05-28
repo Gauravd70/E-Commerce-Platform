@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PutProductRequest {
+public class PatchProductRequest {
     private String name;
     @Min(value = 0)
     private Double price;

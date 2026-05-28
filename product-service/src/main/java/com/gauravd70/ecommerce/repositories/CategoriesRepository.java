@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import com.gauravd70.ecommerce.dtos.documents.CategoryDocument;
 
 @Repository
-public interface CategoriesRepository extends MongoRepository<CategoryDocument, ObjectId>{
+public interface CategoriesRepository extends MongoRepository<CategoryDocument, ObjectId> {
 
 }
