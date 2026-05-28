@@ -13,6 +13,5 @@ import lombok.NoArgsConstructor;
 public class PostCategoryRequest {
     @NotBlank
     private String name;
-    @Builder.Default
-    private boolean active = false;
+    private boolean active;
 }
