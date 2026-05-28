@@ -25,7 +25,10 @@ public class SecurityConfigurations {
             .anonymous(AnonymousConfigurer::disable)
             .logout(LogoutConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(t -> t.authenticationEntryPoint((request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value())))
+            .exceptionHandling(t -> 
+                t.authenticationEntryPoint((request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.setStatus(HttpStatus.FORBIDDEN.value())) 
+            )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/actuator/health/**").permitAll()

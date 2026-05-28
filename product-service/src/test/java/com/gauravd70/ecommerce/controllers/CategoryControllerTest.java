@@ -29,6 +29,17 @@ public class CategoryControllerTest extends BaseControllerTest {
     static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:8.3.2"));
 
     @Test
+    void givenPostCategoryRequest_whenNotAuthorized_thenReturn403Forbidden() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/categories/v1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(PostCategoryRequest.builder().build()))
+                .cookie(getAccessToken("ROLE_CUSTOMER"))
+        ).andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
     void givenPostCategoryRequest_whenInvalid_thenReturn400BadRequest() throws Exception {
         PostCategoryRequest request = PostCategoryRequest.builder().build();
 
