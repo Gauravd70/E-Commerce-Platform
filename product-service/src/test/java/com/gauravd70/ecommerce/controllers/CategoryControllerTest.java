@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 import com.gauravd70.commons.dtos.GenericResponse;
+import com.gauravd70.ecommerce.dtos.requests.PatchCategoryRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostCategoryRequest;
 import com.gauravd70.ecommerce.dtos.responses.CategoryInfoResponse;
 
@@ -56,7 +57,7 @@ public class CategoryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void givenPostCategoryRequest_whenDuplicate_thenReturn200Ok() throws Exception {
+    void givenPostCategoryRequest_whenDuplicate_thenReturn400BadRequest() throws Exception {
         PostCategoryRequest request = PostCategoryRequest.builder().name("Electronics").build();
 
         mockMvc.perform(
@@ -69,7 +70,7 @@ public class CategoryControllerTest extends BaseControllerTest {
 
         mockMvc.perform(
             MockMvcRequestBuilders
-                .post("/v1")
+                .post("/categories/v1")
                 .cookie(getAccessToken("ROLE_SELLER"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -131,5 +132,95 @@ public class CategoryControllerTest extends BaseControllerTest {
                 .cookie(getAccessToken("ROLE_SELLER"))
         ).andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResponse)));
+    }
+
+    @Test
+    void givenPatchCategoryRequest_whenValid_thenReturn200Ok() throws Exception {
+        PostCategoryRequest request = PostCategoryRequest.builder().name("Mobiles").build();
+
+        String postCategoryResponseString = mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/categories/v1")
+                .cookie(getAccessToken("ROLE_SELLER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(MockMvcResultMatchers.status().isCreated())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+        GenericResponse response = objectMapper.readValue(postCategoryResponseString, GenericResponse.class);
+
+        PatchCategoryRequest patchRequest = PatchCategoryRequest.builder().name("Tablets").build();
+
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .patch("/categories/v1/"+response.getId())
+                .cookie(getAccessToken("ROLE_SELLER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patchRequest))
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void givenPatchCategoryRequest_whenDuplicate_thenReturn400BadRequest() throws Exception {
+        PostCategoryRequest request1 = PostCategoryRequest.builder().name("Laptop").build();
+
+        String postCategoryResponseString1 = mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/categories/v1")
+                .cookie(getAccessToken("ROLE_SELLER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request1))
+        ).andExpect(MockMvcResultMatchers.status().isCreated())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+        PostCategoryRequest request2 = PostCategoryRequest.builder().name("Food").build();
+
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/categories/v1")
+                .cookie(getAccessToken("ROLE_SELLER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request2))
+        ).andExpect(MockMvcResultMatchers.status().isCreated());
+
+        GenericResponse response = objectMapper.readValue(postCategoryResponseString1, GenericResponse.class);
+
+        PatchCategoryRequest patchRequest = PatchCategoryRequest.builder().name("Food").build();
+
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .patch("/categories/v1/"+response.getId())
+                .cookie(getAccessToken("ROLE_SELLER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patchRequest))
+        ).andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void givenDeleteCategoryRequest_whenValid_thenReturn200Ok() throws Exception {
+        PostCategoryRequest request = PostCategoryRequest.builder().name("Decor").build();
+
+        String postCategoryResponseString = mockMvc.perform(
+            MockMvcRequestBuilders
+                .post("/categories/v1")
+                .cookie(getAccessToken("ROLE_SELLER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(MockMvcResultMatchers.status().isCreated())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+        GenericResponse response = objectMapper.readValue(postCategoryResponseString, GenericResponse.class);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .delete("/categories/v1/"+response.getId())
+                .cookie(getAccessToken("ROLE_SELLER"))
+        ).andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

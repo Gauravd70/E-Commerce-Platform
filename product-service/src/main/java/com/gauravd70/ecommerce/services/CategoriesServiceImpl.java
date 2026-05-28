@@ -73,6 +73,9 @@ public class CategoriesServiceImpl implements CategoriesService {
 
         CategoryDocument updatedDocument = categoryMapper.toCategoryDocument(document, request);
 
+        System.out.println(document);
+        System.out.println(updatedDocument);
+
         try {
             categoriesRepository.save(updatedDocument);
         } catch(DataIntegrityViolationException e) {
