@@ -29,7 +29,7 @@ public class SecurityConfigurations {
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/actuator/health/**").permitAll()
-                .requestMatchers("/v1/**").hasRole("SELLER")
+                .requestMatchers("/v1/**", "/categories/v1/**").hasRole("SELLER")
                 .anyRequest().authenticated())
             .build();
     }

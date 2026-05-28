@@ -52,8 +52,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductDocument productDocument = productsRepository.findById(id).orElseThrow(() -> new BadRequestException());
-
-        System.out.println(productDocument.toString());
         
         return productMapper.toGetProductResponse(productDocument);
     }
