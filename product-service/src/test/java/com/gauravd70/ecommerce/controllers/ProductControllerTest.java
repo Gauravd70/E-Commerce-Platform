@@ -49,14 +49,15 @@ public class ProductControllerTest extends BaseControllerTest {
     @Autowired
     ProductsRepository productsRepository;
 
-    void givenPostProductRequest_whenNotAuthorized_thenReturn401Unauthorized() throws Exception {
+    @Test
+    void givenPostProductRequest_whenNotAuthorized_thenReturn403Forbidden() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders
                 .post("/v1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(PostProductRequest.builder().build()))
                 .cookie(getAccessToken("ROLE_CUSTOMER"))
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized());
+        ).andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @ParameterizedTest
