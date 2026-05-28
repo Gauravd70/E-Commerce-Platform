@@ -22,7 +22,6 @@ public class SecurityConfigurations {
         return httpSecurity.csrf(CsrfConfigurer::disable)
             .httpBasic(HttpBasicConfigurer::disable)
             .formLogin(FormLoginConfigurer::disable)
-            .anonymous(AnonymousConfigurer::disable)
             .logout(LogoutConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(t -> t.authenticationEntryPoint((request, response, authException) -> response.setStatus(HttpStatus.UNAUTHORIZED.value())))

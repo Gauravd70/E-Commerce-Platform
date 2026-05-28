@@ -22,3 +22,7 @@ jwt:
   expiry:
     access: 3600000
     refresh: 604800000
+
+logging:
+  level: 
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
