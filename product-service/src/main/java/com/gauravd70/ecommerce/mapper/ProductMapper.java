@@ -1,6 +1,5 @@
 package com.gauravd70.ecommerce.mapper;
 
-import org.bson.types.ObjectId;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
