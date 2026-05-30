@@ -1,6 +1,7 @@
 package com.gauravd70.ecommerce.dtos.documents;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,6 +25,7 @@ public class CategoryDocument {
     private String name;
     @Builder.Default
     private boolean active = false;
+    private List<String> variantAttributes;
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate

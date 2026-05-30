@@ -1,5 +1,5 @@
 # Product Service
-This service is responsible for managing the products. 
+This service is responsible for managing the products and category definitions.
 
 ## Content
 - [Low Level Design](#low-level-design-lld)
@@ -24,19 +24,36 @@ This service is responsible for managing the products.
 - jacoco-maven-plugin: Creating code coverage reports
 
 ### Create Product Flow
-1. Call POST [/v1](#post-productsv1)
+1. Call POST [/products/v1](#post-productsv1)
 2. Validate request body
     1. If invalid, return 400 BAD REQUEST
-    2. If valid, fo to step 3
-3. TODO: Call Catalog Service to get the canonical group for the product
+    2. If valid, go to step 3
+3. TODO: Send an event to Catalog Service to generate the familyId and the variantId for the product
 4. Create product document from the request
 5. Persist the document to products collection
 6. TODO: Send an event to inventory service
 7. Return 200 OK 
 
 ### Update Product Flow
+1. Call POST [/products/v1/{productId}](#patch-productsv1productid)
+2. Validate productId
+    1. If invalid, return 400 BAD REQUEST
+    2. If valid, go to step 3
+3. TODO: Send an event to Catalog Service to generate the familyId and the variantId for the product
+4. Create product document from the request
+5. Persist the document to products collection
+6. TODO: Send an event to inventory service
+7. Return 200 OK 
 
 ### Delete Product Flow
+1. Call POST [/products/v1/{productId}](#delete-productsv1productid)
+2. Validate productId
+    1. If invalid, return 400 BAD REQUEST
+    2. If valid, go to step 3
+3. TODO: Send an event to Catalog Service to remove the familyId and the variantId for the product
+4. Delete the product from products collection
+5. TODO: Send an event to inventory service
+6. Return 200 OK 
 
 ## API Specs
 
@@ -44,7 +61,8 @@ This service is responsible for managing the products.
 ```
 Request Body:
 {
-    "name": "asdasd",
+    "brand": "asdasd",
+    "model": "asdad",
     "price": 20.0,
     "quantity": 5,
     "description": "adsanda",
@@ -65,7 +83,14 @@ Request Body:
             "displayOrder": n
         }
     ],
-    "categories": [ObjectId1,.....,ObjectIdn]
+    "categoryId": "cat1",
+    "attributes": {
+        "storage": "1024gb",
+        "ram": "48gb",
+        "color": "red",
+        "processor": "M5",
+        "displaySize": "16"
+    }
 }
 
 Response Body:
@@ -80,10 +105,11 @@ Response Body:
 Response Body:
 200 OK {
     "id": "abcd123",
-    "name": "asdasd",
+    "brand": "asdasd",
+    "model": "asdad",
     "price": 20.0,
-    "quantity": 5,
     "description": "adsanda",
+    "sellerId": "asda",
     "images": [
         {
             "id": 1234,
@@ -101,12 +127,16 @@ Response Body:
             "displayOrder": n
         }
     ],
-    "categories": [
-        cat1Id,
-        .
-        .,
-        catnId
-    ]
+    "categoryId": "cat1",
+    "attributes": {
+        "storage": "1024gb",
+        "ram": "48gb",
+        "color": "red",
+        "processor": "M5",
+        "displaySize": "16"
+    },
+    "createdAt": Date&Time,
+    "updatedAt": Date&Time
 }
 ```
 
@@ -114,7 +144,8 @@ Response Body:
 ```
 Request Body:
 {
-    "name": "asdasd",
+    "brand": "asdasd",
+    "model": "asdad",
     "price": 20.0,
     "quantity": 5,
     "description": "adsanda",
@@ -135,7 +166,14 @@ Request Body:
             "displayOrder": n
         }
     ],
-    "categories": [ObjectId1,.....,ObjectIdn]
+    "categoryId": "cat1",
+    "attributes": {
+        "storage": "1024gb",
+        "ram": "48gb",
+        "color": "red",
+        "processor": "M5",
+        "displaySize": "16"
+    }
 }
 
 Response Body:
@@ -175,7 +213,13 @@ Response Body:
 ```
 Request Body:
 {
-    "name": "cat1"
+    "name": "cat1",
+    "variantAttributes": {
+        "storage",
+        "memory",
+        "color",
+        "processor"
+    }
 }
 
 Response Body:
@@ -185,39 +229,63 @@ Response Body:
 }
 ```
 
-### GET /products/categories
+### GET /products/categories/v1
 ```
 Response Body:
 200 OK {
     categories: [
         {
             "id": "dada",
-            "name": "cat1"
+            "name": "cat1",
+            "variantAttributes": {
+                "storage",
+                "memory",
+                "color",
+                "processor"
+            }
         },
         .
         .
         {
             "id": "afa",
-            "name": "catn"
+            "name": "catn",
+            "variantAttributes": {
+                "storage",
+                "memory",
+                "color",
+            }
         }
     ]
 }
 ```
 
-### GET /products/categories/{categoryId}
+### GET /products/categories/v1/{categoryId}
 ```
 Response Body:
 200 OK {
     "id": "dada",
-    "name": "cat1"
+    "name": "cat1",
+    "variantAttributes": {
+        "storage",
+        "memory",
+        "color",
+        "processor"
+    }
 }
 ```
 
-### PATCH /products/categories/{categoryId}
+### PATCH /products/categories/v1/{categoryId}
 ```
 Request Body:
 {
-    "name": "cat1"
+    "name": "cat1",
+    "active": true/false,
+    "variantAttributes": {
+        "storage",
+        "memory",
+        "color",
+        "processor"
+    }
 }
 
 Response Body:
@@ -226,7 +294,7 @@ Response Body:
 }
 ```
 
-### DELETE /products/categories/{categoryId}
+### DELETE /products/categories/v1/{categoryId}
 ```
 Response Body:
 200 OK 
@@ -236,15 +304,15 @@ Response Body:
 
 ### products collection document
 - id ObjectId
-- name String
+- brand String
+- model String
 - price double
 - description String
 - sellerId long
-- group_id ObjectId
 - active boolean
 - createdAt ISODate
 - updatedAt ISODate
-- categories List\<ObjectId> 
+- categoryId String 
 - images List<[ImageInfo](#imageinfo-document)>
 - attributes JsonObject
 
@@ -258,3 +326,8 @@ Response Body:
 - id ObjectId
 - name String unique
 - active boolean
+- variantAttributes List of String
+- createdAt Date&Time
+- updatedAt Date&Time
+
+### Catalog message

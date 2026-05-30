@@ -76,7 +76,8 @@ public class ProductControllerTest extends BaseControllerTest {
     void givenPostProductRequest_whenValid_thenReturn200OK() throws Exception {
         PostProductRequest request = PostProductRequest
             .builder()
-            .name("Apple MacBook Pro")
+            .brand("Apple")
+            .model("MacBook Pro")
             .price(150000)
             .quantity(10)
             .description("M5 16 inch apple laptop")
@@ -93,7 +94,7 @@ public class ProductControllerTest extends BaseControllerTest {
                     .type("gallery")
                     .displayOrder(1)
                     .build()))
-            .categories(List.of(new ObjectId().toString(), new ObjectId().toString()))
+            .categoryId(new ObjectId().toString())
             .build();
 
             String response = mockMvc.perform(
@@ -131,11 +132,12 @@ public class ProductControllerTest extends BaseControllerTest {
         attributes.put("Color", "Grey");
         attributes.put("Storage", "512GB");
 
-        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+        String categoryId = new ObjectId().toString();
 
         PostProductRequest request = PostProductRequest
             .builder()
-            .name("Apple MacBook Pro")
+            .brand("Apple")
+            .model("MacBook Pro")
             .price(150000)
             .quantity(10)
             .description("M5 16 inch apple laptop")
@@ -152,7 +154,7 @@ public class ProductControllerTest extends BaseControllerTest {
                     .type("gallery")
                     .displayOrder(1)
                     .build()))
-            .categories(categories)
+            .categoryId(categoryId)
             .attributes(attributes)
             .build();
 
@@ -169,7 +171,8 @@ public class ProductControllerTest extends BaseControllerTest {
 
             GetProductResponse expectedResponse = GetProductResponse.builder()
                 .id(genericResponse.getId())
-                .name("Apple MacBook Pro")
+                .brand("Apple")
+            .model("MacBook Pro")
                 .price(150000)
                 .description("M5 16 inch apple laptop")
                 .sellerId(Long.valueOf(claims.getSubject()))
@@ -186,7 +189,7 @@ public class ProductControllerTest extends BaseControllerTest {
                         .type("gallery")
                         .displayOrder(1)
                         .build()))
-                .categories(categories)
+                .categoryId(categoryId)
                 .attributes(attributes)
                 .build();
 
@@ -204,7 +207,6 @@ public class ProductControllerTest extends BaseControllerTest {
                     .isEqualTo(expectedResponse);
             
             Assertions.assertThat(actualResponse.getSellerId()).isNotNull();
-            Assertions.assertThat(actualResponse.getGroupId()).isNotNull();
             Assertions.assertThat(actualResponse.getCreatedAt()).isNotNull();
             Assertions.assertThat(actualResponse.getUpdatedAt()).isNotNull();
 
@@ -224,11 +226,12 @@ public class ProductControllerTest extends BaseControllerTest {
         attributes.put("Color", "Grey");
         attributes.put("Storage", "512GB");
 
-        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+        String categoryId = new ObjectId().toString();
 
         PostProductRequest request = PostProductRequest
             .builder()
-            .name("Apple MacBook Pro")
+            .brand("Apple")
+            .model("MacBook Pro")
             .price(150000)
             .quantity(10)
             .description("M5 16 inch apple laptop")
@@ -245,7 +248,7 @@ public class ProductControllerTest extends BaseControllerTest {
                     .type("gallery")
                     .displayOrder(1)
                     .build()))
-            .categories(categories)
+            .categoryId(categoryId)
             .attributes(attributes)
             .build();
 
@@ -284,11 +287,12 @@ public class ProductControllerTest extends BaseControllerTest {
         attributes.put("Color", "Grey");
         attributes.put("Storage", "512GB");
 
-        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+        String categoryId = new ObjectId().toString();
 
         PostProductRequest postProductRequest = PostProductRequest
             .builder()
-            .name("Apple MacBook Pro")
+            .brand("Apple")
+            .model("MacBook Pro")
             .price(150000)
             .quantity(10)
             .description("M5 16 inch apple laptop")
@@ -305,7 +309,7 @@ public class ProductControllerTest extends BaseControllerTest {
                     .type("gallery")
                     .displayOrder(1)
                     .build()))
-            .categories(categories)
+            .categoryId(categoryId)
             .attributes(attributes)
             .build();
 
@@ -336,7 +340,8 @@ public class ProductControllerTest extends BaseControllerTest {
 
             GetProductResponse expectedGetProductResponse = GetProductResponse.builder()
                 .id(genericResponse.getId())
-                .name("Apple MacBook Pro")
+                .brand("Apple")
+            .model("MacBook Pro")
                 .price(100000)
                 .description("M5 16 inch")
                 .sellerId(Long.valueOf(claims.getSubject()))
@@ -353,7 +358,7 @@ public class ProductControllerTest extends BaseControllerTest {
                         .type("gallery")
                         .displayOrder(1)
                         .build()))
-                .categories(categories)
+                .categoryId(categoryId)
                 .attributes(attributes)
                 .build();
 
@@ -371,7 +376,6 @@ public class ProductControllerTest extends BaseControllerTest {
                     .isEqualTo(expectedGetProductResponse);
             
             Assertions.assertThat(actualResponse.getSellerId()).isNotNull();
-            Assertions.assertThat(actualResponse.getGroupId()).isNotNull();
             Assertions.assertThat(actualResponse.getCreatedAt()).isNotNull();
             Assertions.assertThat(actualResponse.getUpdatedAt()).isNotNull();
 
@@ -391,11 +395,12 @@ public class ProductControllerTest extends BaseControllerTest {
         attributes.put("Color", "Grey");
         attributes.put("Storage", "512GB");
 
-        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+        String categoryId = new ObjectId().toString();
 
         PostProductRequest postProductRequest = PostProductRequest
             .builder()
-            .name("Apple MacBook Pro")
+            .brand("Apple")
+            .model("MacBook Pro")
             .price(150000)
             .quantity(10)
             .description("M5 16 inch apple laptop")
@@ -412,7 +417,7 @@ public class ProductControllerTest extends BaseControllerTest {
                     .type("gallery")
                     .displayOrder(1)
                     .build()))
-            .categories(categories)
+            .categoryId(categoryId)
             .attributes(attributes)
             .build();
 
@@ -445,11 +450,12 @@ public class ProductControllerTest extends BaseControllerTest {
         attributes.put("Color", "Grey");
         attributes.put("Storage", "512GB");
 
-        List<String> categories = List.of(new ObjectId().toString(), new ObjectId().toString());
+        String categoryId = new ObjectId().toString();
 
         PostProductRequest postProductRequest = PostProductRequest
             .builder()
-            .name("Apple MacBook Pro")
+            .brand("Apple")
+            .model("MacBook Pro")
             .price(150000)
             .quantity(10)
             .description("M5 16 inch apple laptop")
@@ -466,7 +472,7 @@ public class ProductControllerTest extends BaseControllerTest {
                     .type("gallery")
                     .displayOrder(1)
                     .build()))
-            .categories(categories)
+            .categoryId(categoryId)
             .attributes(attributes)
             .build();
 

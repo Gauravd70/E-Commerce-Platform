@@ -3,6 +3,7 @@ package com.gauravd70.ecommerce.dtos.requests;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,13 +15,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatchProductRequest {
-    private String name;
+    private String brand;
+    private String model;
     @Min(value = 0)
     private Double price;
     @Min(value = 0)
     private Integer quantity;
     private String description;
-    private List<String> categories;
+    @Valid
     private List<ImageInfoRequest> images;
+    private String categoryId;
     private Map<String, String> attributes;
 }

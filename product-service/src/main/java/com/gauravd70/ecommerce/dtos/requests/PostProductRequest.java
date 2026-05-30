@@ -18,15 +18,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PostProductRequest {
     @NotBlank
-    private String name;
+    private String brand;
+    @NotBlank
+    private String model;
     @PositiveOrZero
     private double price;
     @PositiveOrZero
     private int quantity;
     @NotEmpty
     private String description;
-    private List<String> categories;
     @Valid
     private List<ImageInfoRequest> images;
+    private String categoryId;
     private Map<String, String> attributes;
 }

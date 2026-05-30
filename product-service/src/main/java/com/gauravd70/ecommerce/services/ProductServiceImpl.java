@@ -30,9 +30,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<GenericResponse> createProduct(PostProductRequest request, Claims claims) {
         // TODO call Catalog Service to get the canonical group
 
-        ObjectId groupId = new ObjectId(); 
-
-        ProductDocument productDocument = productMapper.toProductDocument(request, Long.parseLong(claims.getSubject()), groupId);
+        ProductDocument productDocument = productMapper.toProductDocument(request, Long.parseLong(claims.getSubject()));
 
         productDocument = productsRepository.save(productDocument);
 
@@ -70,9 +68,7 @@ public class ProductServiceImpl implements ProductService {
         
         // TODO call Catalog Service to get the canonical group
 
-        ObjectId groupId = productDocument.getGroupId();
-
-        productDocument = productMapper.updateProductDocument(productDocument, request, groupId);
+        productDocument = productMapper.updateProductDocument(productDocument, request);
 
         productsRepository.save(productDocument);
 
