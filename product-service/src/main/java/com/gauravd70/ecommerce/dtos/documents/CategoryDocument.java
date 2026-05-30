@@ -23,8 +23,6 @@ public class CategoryDocument {
     private ObjectId id;
     @Indexed(unique = true)
     private String name;
-    @Builder.Default
-    private boolean active = false;
     private List<String> variantAttributes;
     @CreatedDate
     private Instant createdAt;
