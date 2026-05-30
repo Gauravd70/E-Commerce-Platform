@@ -1,4 +1,4 @@
-run: RabbitMQ CD
+name: RabbitMQ CD
 run-name: Deploy RabbitMQ as infra
 on:
   push:
