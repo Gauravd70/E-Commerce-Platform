@@ -1,0 +1,21 @@
+run: RabbitMQ CD
+run-name: Deploy RabbitMQ as infra
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '/infra/rabbitmq/**'
+jobs:
+  cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: k8s apply
+        uses: Gauravd70/CI-Actions/k8s-apply@v11
+        with:
+          ns: infra
+          k: 'infra/rabbitmq'
+
