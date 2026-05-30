@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /canonical
+
+spring:
+  mongodb:
+    uri: ${MONGODB_URI}
+  data:
+    mongodb:
+      auto-index-creation: true
+
+management:
+  endpoints:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    web:
+      exposure:
+        include: health

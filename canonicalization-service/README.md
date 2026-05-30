@@ -50,15 +50,44 @@ Hash: SHA256(canonical representation)
 ```
 
 ### Store in MongoDB
-- Store the space-separated canonical title, deterministic canonical representation, SHA256 hash, and extracted attributes in the MongoDB [canonical_products](#canonical_products-collection) collection
+- Store the space-separated sentence case canonical title, deterministic canonical representation, SHA256 hash, and extracted attributes in the MongoDB [canonical_products](#canonical_products-collection) collection
 - Why? Since product attributes can be dynamic
 
 ## API Specs
+
+### POST /canonical/v1
+```
+Request Body: {
+    "name": "asdads",
+    "attributes": {
+        "attr1": "val1",
+        "attr2": "val2"
+        "attr3": "val3"
+    }
+}
+
+Repsonse Body: {
+    "groupId": "SHA256"
+}
+```
+
+### GET /canonical/v1/{groupId}
+```
+Response Body: {
+    "id": "asdasda",
+    "name": "Apple MacBook",
+    "groupId": "1231dasda",
+    "createdAt": "Date&Time",
+    "updatedAt": "Date&Time"
+}
+```
 
 ## Schema
 ### canonical_products collection
 _id ObjectId
 name String
-canonicalName String
+canonicalRepresentation String
 groupId String
 attributes Nested JSON (dynamic)
+createdAt ISODateTime
+updatedAt ISODateTime
