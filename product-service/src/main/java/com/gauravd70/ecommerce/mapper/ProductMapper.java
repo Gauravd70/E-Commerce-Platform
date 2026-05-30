@@ -18,7 +18,6 @@ import com.gauravd70.ecommerce.dtos.responses.ImageInfoResponse;
 @Mapper(componentModel = "spring")
 public interface ProductMapper extends BaseMapper{
 
-
     @Mapping(target = "id", ignore = true)
     public ImageInfoDocument toImageInfoDocument(ImageInfoRequest request);
 
@@ -28,7 +27,7 @@ public interface ProductMapper extends BaseMapper{
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    public ProductDocument toProductDocument(PostProductRequest request, long sellerId, ObjectId groupId);
+    public ProductDocument toProductDocument(PostProductRequest request, long sellerId);
 
     public GetProductResponse toGetProductResponse(ProductDocument document);
 
@@ -38,5 +37,5 @@ public interface ProductMapper extends BaseMapper{
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "sellerId", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PatchProductRequest request, ObjectId groupId);
+    public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PatchProductRequest request);
 }

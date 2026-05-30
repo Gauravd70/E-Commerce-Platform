@@ -11,13 +11,13 @@ public class ProductControllerDataProvider {
     public static Stream<PostProductRequest> getInvalidPostProductRequests() {
         return Stream.of(
             PostProductRequest.builder().build(), 
-            PostProductRequest.builder().name("Apple MacBook Pro").build(),
-            PostProductRequest.builder().name("Apple MacBook Pro").price(-1).build(),
-            PostProductRequest.builder().name("Apple MacBook Pro").price(150000).quantity(-1).build(),
-            PostProductRequest.builder().name("Apple MacBook Pro").price(150000).quantity(10).description("").build(),
-            PostProductRequest.builder().name("Apple MacBook Pro").price(150000).quantity(10).description("M5 16 inch apple laptop").images(List.of(ImageInfoRequest.builder().build())).build(),
-            PostProductRequest.builder().name("Apple MacBook Pro").price(150000).quantity(10).description("M5 16 inch apple laptop").images(List.of(ImageInfoRequest.builder().url("https://www.image.com").build())).build(),
-            PostProductRequest.builder().name("Apple MacBook Pro").price(150000).quantity(10).description("M5 16 inch apple laptop").images(List.of(ImageInfoRequest.builder().url("https://www.image.com").type("thumbnail").displayOrder(-1).build())).build()
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").build(),
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").price(-1).build(),
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").price(150000).quantity(-1).build(),
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").price(150000).quantity(10).description("").build(),
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").price(150000).quantity(10).description("M5 16 inch apple laptop").images(List.of(ImageInfoRequest.builder().build())).build(),
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").price(150000).quantity(10).description("M5 16 inch apple laptop").images(List.of(ImageInfoRequest.builder().url("https://www.image.com").build())).build(),
+            PostProductRequest.builder().brand("Apple").model("MacBook Pro").price(150000).quantity(10).description("M5 16 inch apple laptop").images(List.of(ImageInfoRequest.builder().url("https://www.image.com").type("thumbnail").displayOrder(-1).build())).build()
         );
     }
 }

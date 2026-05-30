@@ -21,18 +21,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductDocument {
     private ObjectId id;
-    private String name;
+    private String brand;
+    private String model;
     private double price;
     private String description;
     private long sellerId;
-    private ObjectId groupId;
     @Builder.Default
     private boolean active = false;
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
     private Instant updatedAt;
-    private List<ObjectId> categories;
+    private String categoryId;
     private List<ImageInfoDocument> images;
     private Map<String, String> attributes;
 }

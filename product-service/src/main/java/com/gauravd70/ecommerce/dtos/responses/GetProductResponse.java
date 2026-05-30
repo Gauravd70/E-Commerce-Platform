@@ -15,14 +15,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetProductResponse {
     private String id;
-    private String name;
+    private String brand;
+    private String model;
     private double price;
     private String description;
     private long sellerId;
-    private String groupId;
+    private List<ImageInfoResponse> images;
+    private String categoryId;
+    private Map<String, String> attributes;
     private Instant createdAt;
     private Instant updatedAt;
-    private Map<String, String> attributes;
-    private List<ImageInfoResponse> images;
-    private List<String> categories;
 }

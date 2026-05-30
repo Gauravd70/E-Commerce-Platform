@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.dtos.requests;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class PostCategoryRequest {
     @NotBlank
     private String name;
-    private boolean active;
+    private List<String> variantAttributes;
 }

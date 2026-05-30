@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.dtos.requests;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class PatchCategoryRequest {
     @NotEmpty
     private String name;
-    private Boolean active;
+    private List<String> variantAttributes;
 }
