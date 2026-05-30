@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '/infra/rabbitmq/**'
+      - 'infra/rabbitmq/**'
 jobs:
   cd:
     runs-on: self-hosted
