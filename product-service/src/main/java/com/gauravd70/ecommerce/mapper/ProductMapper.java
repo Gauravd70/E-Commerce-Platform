@@ -6,8 +6,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import com.gauravd70.ecommerce.dtos.documents.CategoryDocument;
 import com.gauravd70.ecommerce.dtos.documents.ImageInfoDocument;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
+import com.gauravd70.ecommerce.dtos.messages.ProductCreatedMessage;
 import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
@@ -37,4 +39,6 @@ public interface ProductMapper extends BaseMapper{
     @Mapping(target = "sellerId", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PatchProductRequest request);
+
+    public ProductCreatedMessage toProductCreatedMessage(ProductDocument productDocument, CategoryDocument category);
 }

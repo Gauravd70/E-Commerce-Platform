@@ -9,6 +9,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.gauravd70.ecommerce.dtos.documents.CategoryDocument;
+import com.gauravd70.ecommerce.dtos.messages.CategoryMessage;
 import com.gauravd70.ecommerce.dtos.requests.PatchCategoryRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostCategoryRequest;
 import com.gauravd70.ecommerce.dtos.responses.CategoryInfoResponse;
@@ -29,4 +30,6 @@ public interface CategoryMapper extends BaseMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     CategoryDocument toCategoryDocument(@MappingTarget CategoryDocument originalDocument, PatchCategoryRequest request);
+
+    CategoryMessage toCategoryMessage(CategoryDocument document);
 }

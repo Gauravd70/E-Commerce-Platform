@@ -330,4 +330,8 @@ Response Body:
 - createdAt Date&Time
 - updatedAt Date&Time
 
-### Catalog message
+### canonical product message
+brand String
+model String
+attributes Json
+category Category Details

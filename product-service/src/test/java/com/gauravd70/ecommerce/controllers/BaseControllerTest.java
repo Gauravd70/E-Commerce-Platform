@@ -3,8 +3,10 @@ package com.gauravd70.ecommerce.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.gauravd70.commons.filters.JwtType;
@@ -22,6 +24,9 @@ public class BaseControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @MockitoBean
+    RabbitTemplate rabbitTemplate;
 
     Cookie getAccessToken(String role) {
         Map<String, Object> claims = new HashMap<>();

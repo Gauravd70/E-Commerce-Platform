@@ -1,6 +1,7 @@
 package com.gauravd70.ecommerce.services;
 
 import org.bson.types.ObjectId;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -8,13 +9,16 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.commons.exceptions.BadRequestException;
+import com.gauravd70.ecommerce.configurations.RabbitMQConfigurations;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
+import com.gauravd70.ecommerce.dtos.messages.ProductCreatedMessage;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductStatusRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
 import com.gauravd70.ecommerce.dtos.responses.GetProductResponse;
 import com.gauravd70.ecommerce.dtos.responses.GetProductStatusResponse;
 import com.gauravd70.ecommerce.mapper.ProductMapper;
+import com.gauravd70.ecommerce.repositories.CategoriesRepository;
 import com.gauravd70.ecommerce.repositories.ProductsRepository;
 
 import io.jsonwebtoken.Claims;
@@ -25,14 +29,20 @@ import lombok.RequiredArgsConstructor;
 public class ProductServiceImpl implements ProductService {
     private final ProductsRepository productsRepository;
     private final ProductMapper productMapper;
+    private final CategoriesRepository categoriesRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public ResponseEntity<GenericResponse> createProduct(PostProductRequest request, Claims claims) {
-        // TODO call Catalog Service to get the canonical group
+        final ProductDocument productDocument = productMapper.toProductDocument(request, Long.parseLong(claims.getSubject()));
 
-        ProductDocument productDocument = productMapper.toProductDocument(request, Long.parseLong(claims.getSubject()));
+        productsRepository.save(productDocument);
+        
+        categoriesRepository.findById(new ObjectId(productDocument.getCategoryId())).ifPresent(category -> {
+            ProductCreatedMessage productCreatedMessage = productMapper.toProductCreatedMessage(productDocument, category);
 
-        productDocument = productsRepository.save(productDocument);
+            rabbitTemplate.convertAndSend(RabbitMQConfigurations.PRODUCT_EXCHANGE, RabbitMQConfigurations.PRODUCT_CREATED_ROUTING_KEY, productCreatedMessage);
+        });
 
         // TODO send event to inventory service
 
