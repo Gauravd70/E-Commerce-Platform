@@ -13,6 +13,7 @@ This service is responsible for managing the products and category definitions.
 - spring-boot-starter-data-mongodb: Implementing data access layer 
 - spring-boot-starter-actuator: Implementing service health APIs
 - spring-boot-starter-security: Implementing authentication and authorization 
+- spring-boot-starter-amqp: Publishing message to RabbitMQ
 - spring-boot-starter-test: Writing integration tests for APIs
 - spring-boot-testcontainers: Managing test containers for integration tests.
 - spring-boot-webmvc-test: Creating clients for tests
@@ -330,7 +331,7 @@ Response Body:
 - createdAt Date&Time
 - updatedAt Date&Time
 
-### canonical product message
+### product created message
 brand String
 model String
 attributes Json
