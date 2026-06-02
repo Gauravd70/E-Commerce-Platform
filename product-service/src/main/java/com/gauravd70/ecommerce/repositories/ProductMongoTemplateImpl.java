@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.repositories;
 
+import java.util.Optional;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductMongoTemplateImpl implements ProductMongoTemplate{
+public class ProductMongoTemplateImpl implements ProductMongoTemplate {
     private final MongoTemplate mongoTemplate;
 
     @Override
@@ -22,5 +24,11 @@ public class ProductMongoTemplateImpl implements ProductMongoTemplate{
         Update update = new Update().set("active", status);
 
         mongoTemplate.updateFirst(query, update, ProductDocument.class);
+    }
+
+    @Override
+    public Optional<ProductDocument> findAndDeleteById(ObjectId id) {
+        Query query = new Query(Criteria.where("_id").eq(id));
+        return Optional.of(mongoTemplate.findAndRemove(query, ProductDocument.class));
     }
 }

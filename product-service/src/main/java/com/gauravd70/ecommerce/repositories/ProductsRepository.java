@@ -8,4 +8,5 @@ import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
 
 @Repository
 public interface ProductsRepository extends MongoRepository<ProductDocument, ObjectId>, ProductMongoTemplate {
+
 }

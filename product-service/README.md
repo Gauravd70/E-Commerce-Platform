@@ -332,7 +332,9 @@ Response Body:
 - updatedAt Date&Time
 
 ### product created message
+id String
 brand String
 model String
 attributes Json
 category Category Details
+action String

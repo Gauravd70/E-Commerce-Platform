@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductCreatedMessage {
+public class ProductActionsMessage {
+    private String id;
     private String brand;
     private String model;
     private Map<String, String> attributes;
     private CategoryMessage category;
+    private String action;
 }
