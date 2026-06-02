@@ -1,4 +1,6 @@
-package com.gauravd70.ecommerce.dtos;
+package com.gauravd70.ecommerce.dtos.messages;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetCanonicalProductResponse {
+public class CategoryMessage {
     private String id;
     private String name;
-    private String groupId;
-    private String createdAt;
-    private String updatedAt; 
+    private List<String> variantAttributes;
 }

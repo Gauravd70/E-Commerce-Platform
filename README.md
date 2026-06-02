@@ -68,7 +68,7 @@
 - [Product Service](product-service/README.md)
 - [Search Service](#search-service)
 - [Recommendation Service](#recommendation-service)
-- [Canonicalization Service](canonicalization-service/README.md)
+- [Catalog Service](catalog-service/README.md)
 - [Inventory Service](#inventory-service)
 - [Checkout Service](#checkout-service)
 - [Payment Gateway](#payment-gateway)

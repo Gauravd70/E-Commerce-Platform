@@ -1,4 +1,4 @@
-package com.gauravd70.ecommerce.dtos;
+package com.gauravd70.ecommerce.dtos.messages;
 
 import java.util.Map;
 
@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostCanonicalProductRequest {
-    private String name;
+public class ProductActionsMessage {
+    private String id;
+    private String brand;
+    private String model;
     private Map<String, String> attributes;
+    private CategoryMessage category;
+    private String action;
 }
