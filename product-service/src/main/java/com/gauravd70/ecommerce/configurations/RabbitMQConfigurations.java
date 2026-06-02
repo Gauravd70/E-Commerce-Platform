@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Profile;
 @Profile("!test")
 public class RabbitMQConfigurations {
     public static final String PRODUCT_EXCHANGE = "product.exchange";
-    public static final String PRODUCT_CREATED_QUEUE = "product.created.queue";
-    public static final String PRODUCT_CREATED_ROUTING_KEY = "product.created.routing.key";
+    public static final String PRODUCT_ACTIONS_QUEUE = "product.actions.queue";
+    public static final String PRODUCT_ACTIONS_ROUTING_KEY = "product.actions.routing.key";
 
     @Bean
     public DirectExchange getExchange() {
@@ -25,12 +25,12 @@ public class RabbitMQConfigurations {
 
     @Bean
     public Queue getQueue() {
-        return QueueBuilder.durable(PRODUCT_CREATED_QUEUE).build();
+        return QueueBuilder.durable(PRODUCT_ACTIONS_QUEUE).build();
     }
 
     @Bean
     public Binding getBinding(DirectExchange exchange, Queue queue) {
-        return BindingBuilder.bind(queue).to(exchange).with(PRODUCT_CREATED_ROUTING_KEY);
+        return BindingBuilder.bind(queue).to(exchange).with(PRODUCT_ACTIONS_ROUTING_KEY);
     }
 
     @Bean

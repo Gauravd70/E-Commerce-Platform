@@ -11,7 +11,8 @@ import com.gauravd70.commons.dtos.GenericResponse;
 import com.gauravd70.commons.exceptions.BadRequestException;
 import com.gauravd70.ecommerce.configurations.RabbitMQConfigurations;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
-import com.gauravd70.ecommerce.dtos.messages.ProductCreatedMessage;
+import com.gauravd70.ecommerce.dtos.messages.ProductAction;
+import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductStatusRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
@@ -39,9 +40,9 @@ public class ProductServiceImpl implements ProductService {
         productsRepository.save(productDocument);
         
         categoriesRepository.findById(new ObjectId(productDocument.getCategoryId())).ifPresent(category -> {
-            ProductCreatedMessage productCreatedMessage = productMapper.toProductCreatedMessage(productDocument, category);
+            ProductActionsMessage productCreatedMessage = productMapper.toProductCreatedMessage(productDocument, category, ProductAction.CREATE);
 
-            rabbitTemplate.convertAndSend(RabbitMQConfigurations.PRODUCT_EXCHANGE, RabbitMQConfigurations.PRODUCT_CREATED_ROUTING_KEY, productCreatedMessage);
+            rabbitTemplate.convertAndSend(RabbitMQConfigurations.PRODUCT_EXCHANGE, RabbitMQConfigurations.PRODUCT_ACTIONS_ROUTING_KEY, productCreatedMessage);
         });
 
         // TODO send event to inventory service
@@ -75,12 +76,16 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductDocument productDocument = productsRepository.findById(id).orElseThrow(() -> new BadRequestException());
-        
-        // TODO call Catalog Service to get the canonical group
 
-        productDocument = productMapper.updateProductDocument(productDocument, request);
+        productMapper.updateProductDocument(productDocument, request);
 
         productsRepository.save(productDocument);
+
+        categoriesRepository.findById(new ObjectId(productDocument.getCategoryId())).ifPresent(category -> {
+            ProductActionsMessage productCreatedMessage = productMapper.toProductCreatedMessage(productDocument, category, ProductAction.UPDATE);
+
+            rabbitTemplate.convertAndSend(RabbitMQConfigurations.PRODUCT_EXCHANGE, RabbitMQConfigurations.PRODUCT_ACTIONS_ROUTING_KEY, productCreatedMessage);
+        });
 
         // TODO send event to Inventory Service to update the inventory
 
@@ -97,7 +102,13 @@ public class ProductServiceImpl implements ProductService {
             throw new BadRequestException();
         }
 
-        productsRepository.deleteById(id);
+        final ProductDocument productDocument = productsRepository.findAndDeleteById(id).orElseThrow(() -> new BadRequestException());
+
+        categoriesRepository.findById(new ObjectId(productDocument.getCategoryId())).ifPresent(category -> {
+            ProductActionsMessage productCreatedMessage = productMapper.toProductCreatedMessage(productDocument, category, ProductAction.DELETE);
+
+            rabbitTemplate.convertAndSend(RabbitMQConfigurations.PRODUCT_EXCHANGE, RabbitMQConfigurations.PRODUCT_ACTIONS_ROUTING_KEY, productCreatedMessage);
+        });
 
         // TODO send event to Inventory service to remove the inventory for the given product
 

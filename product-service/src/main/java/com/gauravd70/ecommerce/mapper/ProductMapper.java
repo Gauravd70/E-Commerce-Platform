@@ -9,7 +9,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.gauravd70.ecommerce.dtos.documents.CategoryDocument;
 import com.gauravd70.ecommerce.dtos.documents.ImageInfoDocument;
 import com.gauravd70.ecommerce.dtos.documents.ProductDocument;
-import com.gauravd70.ecommerce.dtos.messages.ProductCreatedMessage;
+import com.gauravd70.ecommerce.dtos.messages.ProductAction;
+import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
 import com.gauravd70.ecommerce.dtos.requests.ImageInfoRequest;
 import com.gauravd70.ecommerce.dtos.requests.PostProductRequest;
 import com.gauravd70.ecommerce.dtos.requests.PatchProductRequest;
@@ -40,5 +41,6 @@ public interface ProductMapper extends BaseMapper{
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public ProductDocument updateProductDocument(@MappingTarget ProductDocument original, PatchProductRequest request);
 
-    public ProductCreatedMessage toProductCreatedMessage(ProductDocument productDocument, CategoryDocument category);
+    @Mapping(target = "id", source = "productDocument.id")
+    public ProductActionsMessage toProductCreatedMessage(ProductDocument productDocument, CategoryDocument category, ProductAction action);
 }
