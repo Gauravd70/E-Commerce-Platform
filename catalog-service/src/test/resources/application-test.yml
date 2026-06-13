@@ -1,0 +1,19 @@
+server:
+  servlet:
+    context-path: /catalog
+    
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+jwt:
+  secret: uM2low6PI0DELFl+4xBf7lyph25E/UKGI0gAIl2DyJU=
+  expiry:
+    access: 3600000
+    refresh: 604800000

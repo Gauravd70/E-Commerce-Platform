@@ -1,0 +1,33 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /catalog
+
+spring:
+  mongodb:
+    uri: ${MONGODB_URI}
+  data:
+    mongodb:
+      auto-index-creation: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: /
+
+management:
+  endpoints:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    web:
+      exposure:
+        include: health
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiry:
+    access: 3600000
+    refresh: 604800000
