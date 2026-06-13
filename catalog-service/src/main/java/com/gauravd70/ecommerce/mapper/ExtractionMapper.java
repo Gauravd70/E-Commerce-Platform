@@ -3,6 +3,7 @@ package com.gauravd70.ecommerce.mapper;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.gauravd70.ecommerce.dtos.intermediates.ExtractedProduct;
 import com.gauravd70.ecommerce.dtos.intermediates.NormalizedProduct;
-import com.gauravd70.ecommerce.dtos.messages.CategoryMessage;
 import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,10 +51,20 @@ public class ExtractionMapper {
             return null;
         }
 
-        StringBuilder builder = new StringBuilder();
+        String[][] pairs = new String[map.size()][2];
+
+        int i = 0;
 
         for(Map.Entry<String, String> entry : map.entrySet()) {
-            builder.append(entry.getKey()).append("=").append(entry.getValue()).append("|");
+            pairs[i++] = new String[]{entry.getKey(), entry.getValue()};
+        }
+
+        Arrays.sort(pairs, (a, b) -> a[0].compareTo(b[0]));
+
+        StringBuilder builder = new StringBuilder();
+
+        for(String[] pair : pairs) {
+            builder.append(pair[0]).append("=").append(pair[1]).append("|");
         }
 
         builder.deleteCharAt(builder.length() - 1);
