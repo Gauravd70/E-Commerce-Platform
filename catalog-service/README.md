@@ -105,17 +105,17 @@ TODO
 
 ## Schema
 ### catalog collection
-_id ObjectId
-name String
-categoryId String 
-productId String
-familyIdRepresentation String
-variantIdRepresentation String
-familyId String
-variantId String
-attributes Nested JSON (dynamic)
-createdAt ISODateTime
-updatedAt ISODateTime
+- _id ObjectId
+- name String
+- categoryId String 
+- productId String
+- familyIdRepresentation String
+- variantIdRepresentation String
+- familyId String
+- variantId String
+- attributes Nested JSON (dynamic)
+- createdAt ISODateTime
+- updatedAt ISODateTime
 
 ### product created message
 - id String
