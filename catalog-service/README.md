@@ -100,8 +100,30 @@ Hash: SHA256(canonical representation)
 
 ## API Specs
 
-### GET /catalog/{categoryId}
-TODO
+### GET /catalogs/{categoryId}
+```
+Response Body: {
+    catalogs: [
+        {
+            "name": "Apple MacBook Pro",
+            "productId": "ObjectId",
+            "familyId": "canonical SHA256",
+            "variantId": "canonical SHA256"
+        },
+        .
+        .
+        ., 
+        {
+            "name": "Apple MacBook Pro",
+            "productId": "ObjectId",
+            "familyId": "canonical SHA256",
+            "variantId": "canonical SHA256"
+        }
+    ],
+    "lastOffset": "ObjectId",
+    "totalCount": "2000"
+}
+```
 
 ## Schema
 ### catalog collection
@@ -117,7 +139,7 @@ TODO
 - createdAt ISODateTime
 - updatedAt ISODateTime
 
-### product created message
+### product action message
 - id String
 - brand String
 - model String
