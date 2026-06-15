@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: catalog
+        tier: backend
+    spec:
+      containers:
+        - name: catalog-service
+          image: gauravd70/ecommerce-catalog:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: catalog-service 
+          livenessProbe:
+            httpGet:
+              path: /catalog/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /catalog/actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+

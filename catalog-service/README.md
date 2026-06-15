@@ -24,6 +24,22 @@ This service is responsible for canonicalizing products and grouping equivalent 
 - mapstruct: Generating mappers from one model to another.
 - jacoco-maven-plugin: Creating code coverage reports
 
+### Product Created Flow
+- Consume message from the product.actions.queue
+- Route to ProductCreatedHandler
+- Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
+- Convert to Catalog Document
+- Store the productId, familyId and variantId mapping document 
+
+### Product Updated Flow
+- Consume message from the product.actions.queue
+- Route to ProductUpdatedHandler
+- Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
+- Update the productId, famlyId and variantId mapping document
+
+### Handling out of order events
+To prevent inconsistencies because of out of order event we will keep track of the event timestamp and product ID pair in Redis Cache and only allow events with timestamp greater than the current to execute. 
+
 ## Canonicalization Pipeline
 ### Normalization
 - Transforming the text to lowercase
@@ -100,27 +116,78 @@ Hash: SHA256(canonical representation)
 
 ## API Specs
 
-### GET /catalog/{categoryId}
-TODO
+### GET /catalogs/{categoryId}
+```
+Response Body: {
+    catalogs: [
+        {
+            "name": "Apple MacBook Pro",
+            "familyId": "canonical SHA256",
+            "variantId": "canonical SHA256",
+            "attributes": {
+                "storage": "1024gb",
+                "ram": "48gb",
+                "processor": "M5",
+            }
+        },
+        .
+        .
+        ., 
+        {
+            "name": "Apple MacBook Pro",
+            "familyId": "canonical SHA256",
+            "variantId": "canonical SHA256",
+            "attributes": {
+                "storage": "1024gb",
+                "ram": "48gb",
+                "processor": "M5",
+            }
+        }
+    ],
+    "lastOffset": "ObjectId",
+    "totalCount": "2000"
+}
+```
+
+### GET /catalogs/{familyId}?variantId={variantId}
+```
+Response Body: {
+    products: [
+        "id1",
+        .
+        .
+        .,
+        "idn"
+    ]
+}
+```
 
 ## Schema
 ### catalog collection
 - _id ObjectId
 - name String
 - categoryId String 
-- productId String
 - familyIdRepresentation String
 - variantIdRepresentation String
 - familyId String
-- variantId String
-- attributes Nested JSON (dynamic)
+- variantId String 
+- attributes JSON
 - createdAt ISODateTime
 - updatedAt ISODateTime
 
-### product created message
+Index on (familyId + variantId, unique)
+
+### product_catalog_mapping
+productId String
+familyId String
+variantId String
+
+### product action message
 - id String
 - brand String
 - model String
 - attributes Json
 - category Category Details
 - action String
+- createdAt timestamp
+- version String

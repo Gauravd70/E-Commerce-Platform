@@ -40,5 +40,7 @@ public class ProductCreatedHandler extends ProductHandler {
         CatalogDocument catalogDocument = catalogDocumentMapper.toCatalogDocument(extractedProduct);
 
         catalogsRepository.save(catalogDocument);
+
+        // TODO store productId, familyId and variantId mapping
     }
 }

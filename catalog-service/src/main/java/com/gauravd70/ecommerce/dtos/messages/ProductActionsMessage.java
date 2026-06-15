@@ -18,4 +18,6 @@ public class ProductActionsMessage {
     private Map<String, String> attributes;
     private CategoryMessage category;
     private String action;
+    private long createdAt;
+    private String version;
 }
