@@ -29,14 +29,13 @@ This service is responsible for canonicalizing products and grouping equivalent 
 - Route to ProductCreatedHandler
 - Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
 - Convert to Catalog Document
-- Send message to products.ack.queue with the familyId and variantId
+- Store the productId, familyId and variantId mapping document 
 
 ### Product Updated Flow
 - Consume message from the product.actions.queue
 - Route to ProductUpdatedHandler
 - Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
-- Convert to Catalog Document
-- Send message to products.ack.queue with the familyId and variantId
+- Update the productId, famlyId and variantId mapping document
 
 ### Handling out of order events
 To prevent inconsistencies because of out of order event we will keep track of the event timestamp and product ID pair in Redis Cache and only allow events with timestamp greater than the current to execute. 
@@ -150,6 +149,19 @@ Response Body: {
 }
 ```
 
+### GET /catalogs/{familyId}?variantId={variantId}
+```
+Response Body: {
+    products: [
+        "id1",
+        .
+        .
+        .,
+        "idn"
+    ]
+}
+```
+
 ## Schema
 ### catalog collection
 - _id ObjectId
@@ -165,6 +177,11 @@ Response Body: {
 
 Index on (familyId + variantId, unique)
 
+### product_catalog_mapping
+productId String
+familyId String
+variantId String
+
 ### product action message
 - id String
 - brand String
@@ -172,12 +189,5 @@ Index on (familyId + variantId, unique)
 - attributes Json
 - category Category Details
 - action String
-- createdAt timestamp
-- version String
-
-### product ack message
-- productId String
-- familyId String
-- variantId String
 - createdAt timestamp
 - version String

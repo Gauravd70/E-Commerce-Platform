@@ -18,8 +18,6 @@ public class RabbitMQConfigurations {
     public static final String PRODUCT_EXCHANGE = "product.exchange";
     public static final String PRODUCT_ACTIONS_QUEUE = "product.actions.queue";
     public static final String PRODUCT_ACTIONS_ROUTING_KEY = "product.actions.routing.key";
-    public static final String PRODUCT_ACK_QUEUE = "product.ack.queue";
-    public static final String PRODUCT_ACK_ROUTING_KEY = "product.ack.routing.key";
 
     @Bean
     public DirectExchange getExchange() {
@@ -34,11 +32,6 @@ public class RabbitMQConfigurations {
     @Bean
     public Binding getActionsQueueBinding(DirectExchange exchange, @Qualifier(PRODUCT_ACTIONS_QUEUE) Queue queue) {
         return BindingBuilder.bind(queue).to(exchange).with(PRODUCT_ACTIONS_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding getAckQueueBinding(DirectExchange exchange, @Qualifier(PRODUCT_ACK_QUEUE) Queue queue) {
-        return BindingBuilder.bind(queue).to(exchange).with(PRODUCT_ACK_ROUTING_KEY);
     }
 
     @Bean
