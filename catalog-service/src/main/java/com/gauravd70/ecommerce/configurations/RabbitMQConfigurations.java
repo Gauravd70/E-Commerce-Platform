@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,20 +18,27 @@ public class RabbitMQConfigurations {
     public static final String PRODUCT_EXCHANGE = "product.exchange";
     public static final String PRODUCT_ACTIONS_QUEUE = "product.actions.queue";
     public static final String PRODUCT_ACTIONS_ROUTING_KEY = "product.actions.routing.key";
+    public static final String PRODUCT_ACK_QUEUE = "product.ack.queue";
+    public static final String PRODUCT_ACK_ROUTING_KEY = "product.ack.routing.key";
 
     @Bean
     public DirectExchange getExchange() {
         return new DirectExchange(PRODUCT_EXCHANGE, true, false);
     }
 
-    @Bean
+    @Bean(PRODUCT_ACTIONS_QUEUE)
     public Queue getQueue() {
         return QueueBuilder.durable(PRODUCT_ACTIONS_QUEUE).build();
     }
 
     @Bean
-    public Binding getBinding(DirectExchange exchange, Queue queue) {
+    public Binding getActionsQueueBinding(DirectExchange exchange, @Qualifier(PRODUCT_ACTIONS_QUEUE) Queue queue) {
         return BindingBuilder.bind(queue).to(exchange).with(PRODUCT_ACTIONS_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding getAckQueueBinding(DirectExchange exchange, @Qualifier(PRODUCT_ACK_QUEUE) Queue queue) {
+        return BindingBuilder.bind(queue).to(exchange).with(PRODUCT_ACK_ROUTING_KEY);
     }
 
     @Bean

@@ -24,6 +24,23 @@ This service is responsible for canonicalizing products and grouping equivalent 
 - mapstruct: Generating mappers from one model to another.
 - jacoco-maven-plugin: Creating code coverage reports
 
+### Product Created Flow
+- Consume message from the product.actions.queue
+- Route to ProductCreatedHandler
+- Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
+- Convert to Catalog Document
+- Send message to products.ack.queue with the familyId and variantId
+
+### Product Updated Flow
+- Consume message from the product.actions.queue
+- Route to ProductUpdatedHandler
+- Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
+- Convert to Catalog Document
+- Send message to products.ack.queue with the familyId and variantId
+
+### Handling out of order events
+To prevent inconsistencies because of out of order event we will keep track of the event timestamp and product ID pair in Redis Cache and only allow events with timestamp greater than the current to execute. 
+
 ## Canonicalization Pipeline
 ### Normalization
 - Transforming the text to lowercase
@@ -106,18 +123,26 @@ Response Body: {
     catalogs: [
         {
             "name": "Apple MacBook Pro",
-            "productId": "ObjectId",
             "familyId": "canonical SHA256",
-            "variantId": "canonical SHA256"
+            "variantId": "canonical SHA256",
+            "attributes": {
+                "storage": "1024gb",
+                "ram": "48gb",
+                "processor": "M5",
+            }
         },
         .
         .
         ., 
         {
             "name": "Apple MacBook Pro",
-            "productId": "ObjectId",
             "familyId": "canonical SHA256",
-            "variantId": "canonical SHA256"
+            "variantId": "canonical SHA256",
+            "attributes": {
+                "storage": "1024gb",
+                "ram": "48gb",
+                "processor": "M5",
+            }
         }
     ],
     "lastOffset": "ObjectId",
@@ -130,14 +155,15 @@ Response Body: {
 - _id ObjectId
 - name String
 - categoryId String 
-- productId String
 - familyIdRepresentation String
 - variantIdRepresentation String
 - familyId String
-- variantId String
-- attributes Nested JSON (dynamic)
+- variantId String 
+- attributes JSON
 - createdAt ISODateTime
 - updatedAt ISODateTime
+
+Index on (familyId + variantId, unique)
 
 ### product action message
 - id String
@@ -146,3 +172,12 @@ Response Body: {
 - attributes Json
 - category Category Details
 - action String
+- createdAt timestamp
+- version String
+
+### product ack message
+- productId String
+- familyId String
+- variantId String
+- createdAt timestamp
+- version String

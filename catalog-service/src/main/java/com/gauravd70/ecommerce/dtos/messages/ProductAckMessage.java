@@ -1,7 +1,5 @@
 package com.gauravd70.ecommerce.dtos.messages;
 
-import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,13 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductActionsMessage {
-    private String id;
-    private String brand;
-    private String model;
-    private Map<String, String> attributes;
-    private CategoryMessage category;
-    private String action;
+public class ProductAckMessage {
+    private String productId;
+    private String familyId;
+    private String variantId;
     private long createdAt;
     private String version;
 }
