@@ -35,7 +35,13 @@ This service is responsible for canonicalizing products and grouping equivalent 
 - Consume message from the product.actions.queue
 - Route to ProductUpdatedHandler
 - Execute Canonicalization Pipeline steps (Normalization, Extraction, Canonicalization)
+- Create a new catalog if not present
 - Update the productId, famlyId and variantId mapping document
+
+### Produc Deleted Flow
+- Consume message from the product.actions.queue
+- Route to ProductUpdatedHandler
+- Delete the productId to canonical product mapping
 
 ### Handling out of order events
 To prevent inconsistencies because of out of order event we will keep track of the event timestamp and product ID pair in Redis Cache and only allow events with timestamp greater than the current to execute. 
@@ -116,7 +122,7 @@ Hash: SHA256(canonical representation)
 
 ## API Specs
 
-### GET /catalogs/{categoryId}
+### GET /catalogs/v1/{categoryId}
 ```
 Response Body: {
     catalogs: [
@@ -149,7 +155,7 @@ Response Body: {
 }
 ```
 
-### GET /catalogs/{familyId}?variantId={variantId}
+### GET /catalogs/v1/{familyId}?variantId={variantId}
 ```
 Response Body: {
     products: [

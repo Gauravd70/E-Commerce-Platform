@@ -28,12 +28,12 @@ import lombok.NoArgsConstructor;
 public class CatalogDocument {
     @Id
     private ObjectId id;
-    private String familyId;
-    private String variantId;
     private String name;
     private String categoryId;
     private String familyIdRepresentation;
     private String variantIdRepresentation;
+    private String familyId;
+    private String variantId;
     private Map<String, String> attributes;
     @CreatedDate
     private Instant createdAt;
