@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /catalog
+    context-path: /catalogs
     
 spring:
   data:
