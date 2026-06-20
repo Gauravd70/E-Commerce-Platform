@@ -27,7 +27,7 @@ public class CatalogsServiceImpl implements CatalogsService {
     
     @Override
     public GetCatalogsResponse getCatalogs(String categoryId, GetCatalogsRequest request) throws BadRequestException {
-        List<CatalogDocument> catalogs = catalogsRepository.findAllByCategoryIdGreaterThanProductId(categoryId, request.getLastOffset());
+        List<CatalogDocument> catalogs = catalogsRepository.findAllByCategoryIdAndIdGreaterThan(categoryId, request.getLastOffset());
 
         List<GetCatalogDetails> getCatalogsResponses = catalogDocumentMapper.toGetCatalogDetailsList(catalogs);
 

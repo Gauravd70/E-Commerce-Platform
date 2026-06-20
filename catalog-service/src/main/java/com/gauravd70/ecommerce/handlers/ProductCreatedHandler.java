@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.handlers;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +37,7 @@ public class ProductCreatedHandler extends ProductHandler {
 
     @Async("productActionsExecutor")
     @Override
-    public void onHandleMessage(ProductActionsMessage message) {
+    public CompletableFuture<Void> onHandleMessage(ProductActionsMessage message) {
         super.onHandleMessage(message);
 
         NormalizedProduct normalizedProduct = normalizationMapper.toNormalizedProduct(message);
@@ -49,5 +51,7 @@ public class ProductCreatedHandler extends ProductHandler {
         ProductCatalogMappingDocument productCatalogMappingDocument = productCatalogMappingDocumentMapper.toProductCatalogMappingDocument(catalogDocument, message.getId());
 
         productCatalogMappingsRepository.save(productCatalogMappingDocument);
+
+        return CompletableFuture.completedFuture(null);
     }
 }
