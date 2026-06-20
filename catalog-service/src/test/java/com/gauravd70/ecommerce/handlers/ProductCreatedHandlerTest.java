@@ -1,68 +1,31 @@
 package com.gauravd70.ecommerce.handlers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
 
 import com.gauravd70.ecommerce.dtos.documents.CatalogDocument;
+import com.gauravd70.ecommerce.dtos.documents.ProductCatalogMappingDocument;
 import com.gauravd70.ecommerce.dtos.messages.CategoryMessage;
-import com.gauravd70.ecommerce.dtos.messages.ProductAction;
 import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
-import com.gauravd70.ecommerce.repositories.CatalogsRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class ProductCreatedHandlerTest {
-    @Container
-    @ServiceConnection
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:8.3.2"));
-
+public class ProductCreatedHandlerTest extends BaseProductHandlerTest {
     @Autowired
     ProductCreatedHandler productCreatedHandler;
 
-    @Autowired
-    CatalogsRepository catalogsRepository;
-
     @Test
     void givenProductActionsMessage_whenCreateProduct_thenCreateCanonicalProduct() {
-        List<String> variantAttributes = List.of("storage", "ram", "processor", "display size");
+        ProductActionsMessage productActionsMessage = getProductActionsMessage();
 
-        CategoryMessage categoryMessage = CategoryMessage.builder()
-            .id(new ObjectId().toString())
-            .name("Laptop")
-            .variantAttributes(variantAttributes)
-            .build();
-
-        Map<String, String> attributes = new HashMap<>();
-
-        attributes.put("storage", "1TB");
-        attributes.put("ram", "48GB");
-        attributes.put("processor", "M5");
-        attributes.put("display size", "16 inches");
-
-        ProductActionsMessage productActionsMessage = ProductActionsMessage
-            .builder()
-            .id(new ObjectId().toString())
-            .brand("Apple")
-            .model("MacBook Pro")
-            .attributes(attributes)
-            .category(categoryMessage)
-            .action(ProductAction.CREATE.name())
-            .createdAt(System.currentTimeMillis())
-            .version(1)
-            .build();
+        CategoryMessage categoryMessage = productActionsMessage.getCategory();
 
         Map<String, String> expectedAttributes = new HashMap<>();
 
@@ -82,20 +45,48 @@ public class ProductCreatedHandlerTest {
 
         productCreatedHandler.onHandleMessage(productActionsMessage).join();
 
-        catalogsRepository.findAll().stream().findFirst()
-            .ifPresentOrElse(
-                t -> {
-                    Assertions.assertThat(t.getId()).isNotNull();
-                    Assertions.assertThat(t.getFamilyId()).isNotNull();
-                    Assertions.assertThat(t.getVariantId()).isNotNull();
-                    Assertions.assertThat(t.getCreatedAt()).isNotNull();
-                    Assertions.assertThat(t.getUpdatedAt()).isNotNull();
+        CatalogDocument actualDocument = catalogsRepository.findAll().stream().findFirst().orElseGet(() -> Assertions.fail());
 
-                    Assertions.assertThat(t)
-                        .usingRecursiveComparison()
-                        .ignoringFields("id", "familyId", "variantId", "createdAt", "updatedAt")
-                        .isEqualTo(expectedDocument);
-                }, 
-                () -> Assertions.fail());
+        Assertions.assertThat(actualDocument.getId()).isNotNull();
+        Assertions.assertThat(actualDocument.getFamilyId()).isNotNull();
+        Assertions.assertThat(actualDocument.getVariantId()).isNotNull();
+        Assertions.assertThat(actualDocument.getCreatedAt()).isNotNull();
+        Assertions.assertThat(actualDocument.getUpdatedAt()).isNotNull();
+
+        Assertions.assertThat(actualDocument)
+            .usingRecursiveComparison()
+            .ignoringFields("id", "familyId", "variantId", "createdAt", "updatedAt")
+            .isEqualTo(expectedDocument);
+        
+        ProductCatalogMappingDocument expectedProductCatalogMappingDocument = ProductCatalogMappingDocument
+                    .builder()
+                    .productId(productActionsMessage.getId())
+                    .familyId(actualDocument.getFamilyId())
+                    .variantId(actualDocument.getVariantId())
+                    .build();
+        
+        ProductCatalogMappingDocument actualProductCatalogMappingDocument = productCatalogMappingsRepository.findOneByProductId(productActionsMessage.getId()).orElseGet(() -> Assertions.fail());
+
+        Assertions.assertThat(actualProductCatalogMappingDocument)
+            .usingRecursiveComparison()
+            .ignoringFields("id")
+            .isEqualTo(expectedProductCatalogMappingDocument);
+    }
+
+    @Test
+    void givenProductActionsMessage_whenProductCreatedAndCanonicalProductAlreadyExists_thenCreateMapping() {
+        ProductActionsMessage productActionsMessage1 = getProductActionsMessage();
+
+        productCreatedHandler.onHandleMessage(productActionsMessage1).join();
+
+        ProductActionsMessage productActionsMessage2 = getProductActionsMessage();
+
+        productCreatedHandler.onHandleMessage(productActionsMessage2).join();
+
+        Assertions.assertThat(catalogsRepository.count()).isEqualTo(1);
+
+        CatalogDocument catalogDocument = catalogsRepository.findAll().stream().findFirst().orElseGet(() -> Assertions.fail());
+
+        Assertions.assertThat(productCatalogMappingsRepository.findAllByFamilyIdAndVariantId(catalogDocument.getFamilyId(), catalogDocument.getVariantId()).size()).isEqualTo(2);
     }
 }
