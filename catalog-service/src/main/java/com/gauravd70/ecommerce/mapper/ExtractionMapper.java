@@ -20,13 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class ExtractionMapper {
-     public String toSHA26(String id) {
+     public String toSHA256(String id) {
         if(id == null) {
             return null;
         }
         
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-26");
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             
             byte[] idBytes = id.getBytes(StandardCharsets.UTF_8);
 
@@ -67,7 +67,9 @@ public class ExtractionMapper {
             builder.append(pair[0]).append("=").append(pair[1]).append("|");
         }
 
-        builder.deleteCharAt(builder.length() - 1);
+        if(builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
 
         return builder.toString();
     }
@@ -95,11 +97,11 @@ public class ExtractionMapper {
 
         Map<String, String> familyAttributes = new HashMap<>();
 
-        if(normalizedProduct.getBrand() == null) {
+        if(normalizedProduct.getBrand() != null) {
             familyAttributes.put("brand", normalizedProduct.getBrand());
         }
 
-        if(normalizedProduct.getModel() == null) {
+        if(normalizedProduct.getModel() != null) {
             familyAttributes.put("model", normalizedProduct.getModel());
         }
 
@@ -114,16 +116,26 @@ public class ExtractionMapper {
         StringBuilder builder = new StringBuilder();
 
         for(String string : strings) {
-            char[] chars = string.toCharArray();
+            String[] words = string.split(" ");
 
-            if(chars.length > 0) {
-                chars[0] = Character.toUpperCase(chars[0]);
+            if(words.length > 1) {
+                builder.append(toSentenceCase(words));
+            } else {
+                char[] chars = string.toCharArray();
+
+                if(chars.length > 0) {
+                    chars[0] = Character.toUpperCase(chars[0]);
+                }
+
+                builder.append(new String(chars));
             }
 
-            builder.append(new String(chars)).append(" ");
+            builder.append(" ");
         }
 
-        builder.deleteCharAt(builder.length() - 1);
+        if(builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
 
         return builder.toString();
     }
@@ -147,8 +159,8 @@ public class ExtractionMapper {
         return extractedProduct.toBuilder()
             .familyIdRepresentation(familyIdRepresentation)
             .variantIdRepresentation(variantIdRepresentation)
-            .familyId(toSHA26(familyIdRepresentation))
-            .variantId(toSHA26(variantIdRepresentation))
+            .familyId(toSHA256(familyIdRepresentation))
+            .variantId(toSHA256(variantIdRepresentation))
             .build();
     } 
 }

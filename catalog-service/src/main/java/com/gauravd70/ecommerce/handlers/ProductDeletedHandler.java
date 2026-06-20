@@ -1,5 +1,7 @@
 package com.gauravd70.ecommerce.handlers;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.stereotype.Component;
 
 import com.gauravd70.ecommerce.dtos.messages.ProductAction;
@@ -19,10 +21,12 @@ public class ProductDeletedHandler extends ProductHandler {
     }
 
     @Override
-    public void onHandleMessage(ProductActionsMessage message) {
+    public CompletableFuture<Void> onHandleMessage(ProductActionsMessage message) {
         super.onHandleMessage(message);
 
         productCatalogMappingsRepository.findOneByProductId(message.getId())
             .ifPresent(document -> productCatalogMappingsRepository.deleteOneByProductId(message.getId()));
+
+        return CompletableFuture.completedFuture(null);
     }
 }

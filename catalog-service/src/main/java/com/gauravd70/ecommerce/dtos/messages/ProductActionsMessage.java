@@ -19,5 +19,5 @@ public class ProductActionsMessage {
     private CategoryMessage category;
     private String action;
     private long createdAt;
-    private String version;
+    private int version;
 }

@@ -18,7 +18,7 @@ This service is responsible for canonicalizing products and grouping equivalent 
 - spring-boot-testcontainers: Managing test containers for integration tests.
 - spring-boot-webmvc-test: Creating clients for tests
 - junit-jupiter: Annotations for wiring Junit with Test containers
-- mongodb: Implementation for MySQL test containers 
+- mongodb: Implementation for MongoDB test containers 
 - lombok: Generating boiler plate code
 - commons-spring: [refer]()
 - mapstruct: Generating mappers from one model to another.
