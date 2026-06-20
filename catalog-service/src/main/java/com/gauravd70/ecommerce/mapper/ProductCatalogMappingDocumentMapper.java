@@ -9,8 +9,10 @@ import com.gauravd70.ecommerce.dtos.documents.ProductCatalogMappingDocument;
 
 @Mapper(componentModel = "spring")
 public interface ProductCatalogMappingDocumentMapper {
+    @Mapping(target = "id", ignore = true)
     public ProductCatalogMappingDocument toProductCatalogMappingDocument(CatalogDocument catalogDocument, String productId);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "productId", ignore = true)
     public ProductCatalogMappingDocument toProductCatalogMappingDocument(@MappingTarget ProductCatalogMappingDocument target, CatalogDocument catalogDocument);
 }

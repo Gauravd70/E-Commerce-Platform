@@ -2,6 +2,7 @@ package com.gauravd70.ecommerce.handlers;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +20,11 @@ import com.gauravd70.ecommerce.repositories.CatalogsRepository;
 import com.gauravd70.ecommerce.repositories.ProductCatalogMappingsRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProductCreatedHandler extends ProductHandler {
     private final CatalogsRepository catalogsRepository;
     private final NormalizationMapper normalizationMapper;
@@ -46,7 +49,11 @@ public class ProductCreatedHandler extends ProductHandler {
 
         CatalogDocument catalogDocument = catalogDocumentMapper.toCatalogDocument(extractedProduct);
 
-        catalogsRepository.save(catalogDocument);
+        try {
+            catalogsRepository.save(catalogDocument);
+        } catch(DuplicateKeyException e) {
+            log.info("Catalog already exists! Skipping catalog creation");
+        }
 
         ProductCatalogMappingDocument productCatalogMappingDocument = productCatalogMappingDocumentMapper.toProductCatalogMappingDocument(catalogDocument, message.getId());
 
