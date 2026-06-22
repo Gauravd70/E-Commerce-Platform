@@ -6,17 +6,12 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.gauravd70.ecommerce.dtos.documents.CatalogDocument;
 import com.gauravd70.ecommerce.dtos.documents.ProductCatalogMappingDocument;
 import com.gauravd70.ecommerce.dtos.messages.CategoryMessage;
 import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 public class ProductCreatedHandlerTest extends BaseProductHandlerTest {
     @Autowired
     ProductCreatedHandler productCreatedHandler;

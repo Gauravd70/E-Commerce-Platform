@@ -7,7 +7,10 @@ import java.util.Map;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
@@ -18,6 +21,8 @@ import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
 import com.gauravd70.ecommerce.repositories.CatalogsRepository;
 import com.gauravd70.ecommerce.repositories.ProductCatalogMappingsRepository;
 
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class BaseProductHandlerTest {
     @Container
     @ServiceConnection
