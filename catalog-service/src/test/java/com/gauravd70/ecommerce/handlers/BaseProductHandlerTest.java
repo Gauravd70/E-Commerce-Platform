@@ -15,15 +15,14 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
+import com.gauravd70.ecommerce.base.BaseTest;
 import com.gauravd70.ecommerce.dtos.messages.CategoryMessage;
 import com.gauravd70.ecommerce.dtos.messages.ProductAction;
 import com.gauravd70.ecommerce.dtos.messages.ProductActionsMessage;
 import com.gauravd70.ecommerce.repositories.CatalogsRepository;
 import com.gauravd70.ecommerce.repositories.ProductCatalogMappingsRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public class BaseProductHandlerTest {
+public class BaseProductHandlerTest extends BaseTest {
     @Container
     @ServiceConnection
     static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:8.3.2"));
@@ -64,7 +63,7 @@ public class BaseProductHandlerTest {
     }
 
     @AfterEach
-    void onTestCompleted() {
+    void onAfterEach() {
         catalogsRepository.deleteAll();
         productCatalogMappingsRepository.deleteAll();
     }

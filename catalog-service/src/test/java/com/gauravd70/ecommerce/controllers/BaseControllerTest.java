@@ -11,11 +11,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.gauravd70.commons.filters.JwtType;
 import com.gauravd70.commons.filters.JwtUtils;
+import com.gauravd70.ecommerce.base.BaseTest;
 
 import jakarta.servlet.http.Cookie;
 import tools.jackson.databind.ObjectMapper;
 
-public class BaseControllerTest {
+public class BaseControllerTest extends BaseTest {
     @Autowired
     MockMvc mockMvc;
 
