@@ -11,5 +11,7 @@ import com.gauravd70.ecommerce.dtos.documents.CatalogDocument;
 public interface CatalogsRepository extends MongoRepository<CatalogDocument, ObjectId> {
     public Optional<CatalogDocument> findOneByFamilyIdAndVariantId(String familyId, String variantId);
 
-    public List<CatalogDocument> findAllByCategoryIdAndIdGreaterThan(String categoryId, String id);
+    public List<CatalogDocument> findFirst20ByCategoryIdAndIdGreaterThan(String categoryId, ObjectId id);
+
+    public List<CatalogDocument> findFirst20AllByCategoryId(String categoryId);
 }

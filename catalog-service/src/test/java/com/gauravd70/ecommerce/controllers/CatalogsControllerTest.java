@@ -1,12 +1,9 @@
 package com.gauravd70.ecommerce.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
-import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -34,6 +31,7 @@ public class CatalogsControllerTest extends BaseControllerTest {
     @BeforeAll
     void onBeforeAll() {
         catalogsRepository.saveAll(CatalogsControllerDataProvider.catalogs);
+        System.out.println(CatalogDocument.class.getName() + " added : " + catalogsRepository.count()); 
     }
     
     @AfterEach
@@ -59,8 +57,20 @@ public class CatalogsControllerTest extends BaseControllerTest {
             .getContentAsString();
         
         GetCatalogsResponse actualGetCatalogResponse = objectMapper.readValue(response, GetCatalogsResponse.class);
+
+        List<CatalogDocument> catalogDocuments;
         
-        List<CatalogDocument> catalogDocuments = catalogsRepository.findAllByCategoryIdAndIdGreaterThan(categoryId.toString(), request.getLastOffset());
+        if(request.getLastOffset() == null) {
+            catalogDocuments = catalogsRepository.findFirst20AllByCategoryId(categoryId);
+        } else {
+            catalogDocuments = catalogsRepository.findFirst20ByCategoryIdAndIdGreaterThan(categoryId.toString(), new ObjectId(request.getLastOffset()));
+        }
+
+        String lastOffset = null;
+
+        if(catalogDocuments.size() > 0) {
+            lastOffset = catalogDocuments.get(catalogDocuments.size() - 1).getId().toString();
+        }
         
         List<GetCatalogDetails> catalogDetails = catalogDocuments.stream().map(document -> {
             return GetCatalogDetails
@@ -72,7 +82,7 @@ public class CatalogsControllerTest extends BaseControllerTest {
                 .build();
         }).toList();
 
-        GetCatalogsResponse expectedCatalogsResponse = GetCatalogsResponse.builder().catalogs(catalogDetails).build();
+        GetCatalogsResponse expectedCatalogsResponse = GetCatalogsResponse.builder().catalogs(catalogDetails).lastOffset(lastOffset).build();
 
         Assertions.assertThat(actualGetCatalogResponse).isEqualTo(expectedCatalogsResponse);
     }
