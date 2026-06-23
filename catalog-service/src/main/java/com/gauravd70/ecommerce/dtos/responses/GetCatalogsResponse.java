@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetCatalogsResponse {
     private List<GetCatalogDetails> catalogs;
+    private String lastOffset;
 }

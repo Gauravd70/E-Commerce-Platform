@@ -23,6 +23,7 @@ This service is responsible for canonicalizing products and grouping equivalent 
 - commons-spring: [refer]()
 - mapstruct: Generating mappers from one model to another.
 - jacoco-maven-plugin: Creating code coverage reports
+- instancio-core: generate test data
 
 ### Product Created Flow
 - Consume message from the product.actions.queue

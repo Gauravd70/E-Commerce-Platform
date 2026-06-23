@@ -25,7 +25,7 @@ public class CatalogsController {
         return catalogsService.getCatalogs(categoryId, getCatalogsRequest);
     }
 
-    @GetMapping(value = "/{familyId}")
+    @GetMapping(value = "ids/{familyId}")
     public GetProductIdsResponse GetProductIds(@PathVariable("familyId") String familyId, GetProductIdsRequest getProductIdsRequest) {
         return catalogsService.getProductIds(familyId, getProductIdsRequest);
     }

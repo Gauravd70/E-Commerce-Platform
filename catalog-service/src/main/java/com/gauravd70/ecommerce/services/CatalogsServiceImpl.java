@@ -2,6 +2,7 @@ package com.gauravd70.ecommerce.services;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import com.gauravd70.commons.exceptions.BadRequestException;
@@ -27,11 +28,23 @@ public class CatalogsServiceImpl implements CatalogsService {
     
     @Override
     public GetCatalogsResponse getCatalogs(String categoryId, GetCatalogsRequest request) throws BadRequestException {
-        List<CatalogDocument> catalogs = catalogsRepository.findAllByCategoryIdAndIdGreaterThan(categoryId, request.getLastOffset());
+        List<CatalogDocument> catalogs;
+        
+        if(request.getLastOffset() == null) {
+            catalogs = catalogsRepository.findFirst20AllByCategoryId(categoryId);
+        } else {
+            catalogs = catalogsRepository.findFirst20ByCategoryIdAndIdGreaterThan(categoryId, new ObjectId(request.getLastOffset()));
+        }
 
         List<GetCatalogDetails> getCatalogsResponses = catalogDocumentMapper.toGetCatalogDetailsList(catalogs);
 
-        return GetCatalogsResponse.builder().catalogs(getCatalogsResponses).build();
+        String lastOffset = null;
+
+        if(catalogs.size() > 0) {
+            lastOffset = catalogs.get(catalogs.size() - 1).getId().toString();
+        }
+
+        return GetCatalogsResponse.builder().catalogs(getCatalogsResponses).lastOffset(lastOffset).build();
     }
 
     @Override
