@@ -15,5 +15,7 @@ public interface ProductCatalogMappingsRepository extends MongoRepository<Produc
 
     public void deleteOneByProductId(String productId);
 
-    public List<ProductCatalogMappingDocument> findAllByFamilyIdAndVariantId(String familyId, String variantId);
+    public List<ProductCatalogMappingDocument> findFirst20ByFamilyIdAndVariantId(String familyId, String variantId);
+
+    public List<ProductCatalogMappingDocument> findFirst20ByFamilyIdAndVariantIdAndIdGreaterThan(String familyId, String variantId, ObjectId id);
 }

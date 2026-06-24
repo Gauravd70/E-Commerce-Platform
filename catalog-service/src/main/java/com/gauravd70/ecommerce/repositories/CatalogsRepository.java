@@ -13,5 +13,5 @@ public interface CatalogsRepository extends MongoRepository<CatalogDocument, Obj
 
     public List<CatalogDocument> findFirst20ByCategoryIdAndIdGreaterThan(String categoryId, ObjectId id);
 
-    public List<CatalogDocument> findFirst20AllByCategoryId(String categoryId);
+    public List<CatalogDocument> findFirst20ByCategoryId(String categoryId);
 }

@@ -1,6 +1,7 @@
 package com.gauravd70.ecommerce.dtos.documents;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -12,8 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "product_catalog_mappings")
+@Document(collection = "productCatalogMappings")
 public class ProductCatalogMappingDocument {
+    @Id
     private ObjectId id;
     private String productId;
     private String familyId;
