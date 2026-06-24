@@ -31,7 +31,7 @@ public class CatalogsServiceImpl implements CatalogsService {
         List<CatalogDocument> catalogs;
         
         if(request.getLastOffset() == null) {
-            catalogs = catalogsRepository.findFirst20AllByCategoryId(categoryId);
+            catalogs = catalogsRepository.findFirst20ByCategoryId(categoryId);
         } else {
             catalogs = catalogsRepository.findFirst20ByCategoryIdAndIdGreaterThan(categoryId, new ObjectId(request.getLastOffset()));
         }
@@ -49,10 +49,22 @@ public class CatalogsServiceImpl implements CatalogsService {
 
     @Override
     public GetProductIdsResponse getProductIds(String familyId, GetProductIdsRequest request) {
-        List<ProductCatalogMappingDocument> productCatalogMappingDocuments = productCatalogMappingsRepository.findAllByFamilyIdAndVariantId(familyId, familyId);
+        List<ProductCatalogMappingDocument> productCatalogMappingDocuments;
+
+        if(request.getLastOffset() != null) {
+            productCatalogMappingDocuments = productCatalogMappingsRepository.findFirst20ByFamilyIdAndVariantIdAndIdGreaterThan(familyId, request.getVariantId(), new ObjectId(request.getLastOffset()));
+        } else {
+            productCatalogMappingDocuments = productCatalogMappingsRepository.findFirst20ByFamilyIdAndVariantId(familyId, request.getVariantId());
+        }
 
         List<String> productIds = productCatalogMappingDocuments.stream().map(document -> document.getProductId()).toList();
 
-        return GetProductIdsResponse.builder().products(productIds).build();
+        String lastOffset = null;
+
+        if(productCatalogMappingDocuments.size() > 0) {
+            lastOffset = productCatalogMappingDocuments.get(productCatalogMappingDocuments.size() - 1).getId().toString();
+        }
+
+        return GetProductIdsResponse.builder().products(productIds).lastOffset(lastOffset).build();
     }
 }

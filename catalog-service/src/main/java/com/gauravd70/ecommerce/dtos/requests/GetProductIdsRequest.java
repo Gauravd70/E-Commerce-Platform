@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetProductIdsRequest {
     private String variantId;
+    private String lastOffset;
 }

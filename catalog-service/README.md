@@ -156,7 +156,7 @@ Response Body: {
 }
 ```
 
-### GET /catalogs/v1/{familyId}?variantId={variantId}
+### GET /catalogs/v1/ids/{familyId}?variantId={variantId}
 ```
 Response Body: {
     products: [
@@ -184,10 +184,11 @@ Response Body: {
 
 Index on (familyId + variantId, unique)
 
-### product_catalog_mapping
-productId String
-familyId String
-variantId String
+### productCatalogMappings
+- id ObjectId
+- productId String
+- familyId String
+- variantId String
 
 ### product action message
 - id String

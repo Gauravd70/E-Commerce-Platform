@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetProductIdsResponse {
     private List<String> products;
+    private String lastOffset;
 }

@@ -82,6 +82,6 @@ public class ProductCreatedHandlerTest extends BaseProductHandlerTest {
 
         CatalogDocument catalogDocument = catalogsRepository.findAll().stream().findFirst().orElseGet(() -> Assertions.fail());
 
-        Assertions.assertThat(productCatalogMappingsRepository.findAllByFamilyIdAndVariantId(catalogDocument.getFamilyId(), catalogDocument.getVariantId()).size()).isEqualTo(2);
+        Assertions.assertThat(productCatalogMappingsRepository.findFirst20ByFamilyIdAndVariantId(catalogDocument.getFamilyId(), catalogDocument.getVariantId()).size()).isEqualTo(2);
     }
 }
